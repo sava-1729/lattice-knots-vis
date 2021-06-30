@@ -46,7 +46,7 @@ class Stick:
         self.vector = self.end - self.start
 
     def plot(self, obj, color="b"):
-        obj.plot(self.X, self.Y, self.Z, color=color, linewidth=4)
+        obj.plot(self.X, self.Y, self.Z, color=color, linewidth=4, alpha=1)
 
     def shares_plane_with(self, other_stick):
         assert isinstance(other_stick, Stick)
@@ -121,16 +121,17 @@ class StickKnot:
         self.vertices = vertices
         self.length = len(vertices)
 
-    def plot(self, color="b", highlight_vertices=True):
+    def plot(self, fix_color=None, highlight_vertices=True):
         fig = plt.figure()
         ax = fig.gca(projection="3d")
-        for stick in self.sticks:
-            stick.plot(ax)#, color=color)
+        for i, stick in enumerate(self.sticks):
+            stick.plot(ax, color=(get_new_color(i) if fix_color is None else fix_color))
         if highlight_vertices:
             ax.scatter3D(*list(zip(*self.vertices)), c="black", marker="o", s=40)
         ax.set_xlabel("X")
         ax.set_ylabel("Y")
         ax.set_zlabel("Z")
+        # ax.view_init(azim=30, elev=30)
         return fig
 
 def construct_knot(directions):

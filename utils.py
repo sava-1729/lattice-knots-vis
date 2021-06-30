@@ -1,4 +1,11 @@
 import numpy as np
+from matplotlib import colors as mcolors
+
+COLORS = list(mcolors.BASE_COLORS.values()) + list(mcolors.TABLEAU_COLORS.values())
+L = len(COLORS)
+
+def get_new_color(i):
+    return COLORS[i % L]
 
 def get_error_msg(name_of_erroneous_item, expected_value, actual_value):
     msg = name_of_erroneous_item + " incorrect! \n"
