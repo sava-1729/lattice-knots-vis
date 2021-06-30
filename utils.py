@@ -1,4 +1,11 @@
 import numpy as np
+import matplotlib.colors as mcolors
+
+COLORS = [mcolors.hex2color(clr) for clr in list(mcolors.XKCD_COLORS.values())]
+NUM_COLORS = len(COLORS)
+
+def get_color(i):
+    return COLORS[i % NUM_COLORS]
 
 def get_error_msg(name_of_erroneous_item, expected_value, actual_value):
     msg = name_of_erroneous_item + " incorrect! \n"
