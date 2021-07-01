@@ -1,8 +1,6 @@
-import enum
 import numpy as np
-import mayavi.mlab as mlab
-# from mpl_toolkits.mplot3d import Axes3D
-# import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.pyplot as plt
 from utils import *
 
 """
@@ -44,13 +42,11 @@ class Stick:
         self.start = np.array(start)
         self.end = np.array(end)
         assert any(self.start != self.end)
-        self.X = np.linspace(self.start[0], self.end[0], 3)
-        self.Y = np.linspace(self.start[1], self.end[1], 3)
-        self.Z = np.linspace(self.start[2], self.end[2], 3)
+        self.X, self.Y, self.Z = zip(self.start, self.end)
         self.vector = self.end - self.start
 
-    def plot(self, fig, color="b"):
-        mlab.plot3d(self.X, self.Y, self.Z, color=color, line_width=8, figure=fig)
+    def plot(self, obj, color="b"):
+        obj.plot(self.X, self.Y, self.Z, color=color, linewidth=4)
 
     def shares_plane_with(self, other_stick):
         assert isinstance(other_stick, Stick)
@@ -126,14 +122,15 @@ class StickKnot:
         self.length = len(vertices)
 
     def plot(self, color="b", highlight_vertices=True):
-        fig = mlab.figure(bgcolor=(1,1,1))
-        for i, stick in enumerate(self.sticks):
-            stick.plot(fig, color=get_color(i))
+        fig = plt.figure()
+        ax = fig.gca(projection="3d")
+        for stick in self.sticks:
+            stick.plot(ax)#, color=color)
         if highlight_vertices:
-            mlab.points3d(*list(zip(*self.vertices)), figure=fig, color=(0,0,0), scale_factor=0.1)
-        # ax.set_xlabel("X")
-        # ax.set_ylabel("Y")
-        # ax.set_zlabel("Z")
+            ax.scatter3D(*list(zip(*self.vertices)), c="black", marker="o", s=40)
+        ax.set_xlabel("X")
+        ax.set_ylabel("Y")
+        ax.set_zlabel("Z")
         return fig
 
 def construct_knot(directions):
@@ -141,9 +138,8 @@ def construct_knot(directions):
     vertices = [origin]
     for d in directions:
         vertices.append(vertices[-1] + d)
-    return StickKnot(vertices)
+    return StickKnot(vertices).plot()
 
-my_knot = construct_knot(DIRECTIONS)
-my_knot.plot()
-mlab.show()
-# plt.show()
+fig = construct_knot(DIRECTIONS)
+
+plt.show()

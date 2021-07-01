@@ -1,8 +1,20 @@
 import numpy as np
 import matplotlib.colors as mcolors
+import mayavi.mlab as mlab
+from random import randint
 
-COLORS = [mcolors.hex2color(clr) for clr in list(mcolors.XKCD_COLORS.values())]
+PRE_COLORS = list(mcolors.BASE_COLORS.values()) + list(mcolors.XKCD_COLORS.values())
+PRE_COLORS.remove(mcolors.BASE_COLORS["w"])
+PRE_COLORS.remove(mcolors.BASE_COLORS["k"])
+COLORS = [mcolors.hex2color(clr) for clr in list(PRE_COLORS)]
 NUM_COLORS = len(COLORS)
+FIGURE = None
+
+def get_random_color():
+    global NUM_COLORS
+    color = COLORS.pop(randint(0, NUM_COLORS))
+    NUM_COLORS -= 1
+    return color
 
 def get_color(i):
     return COLORS[i % NUM_COLORS]
@@ -19,19 +31,21 @@ def assert_is_3d_point(x):
     for c in x:
         assert isinstance(c, (int, float)) or np.issubdtype(c, np.number), get_error_msg("Point coordinate datatype", "int or float", type(c))
 
-# def assert_is_matrix(M, n):
-#     assert isinstance(M, (tuple, list))
-#     assert len(M) == n
-#     for row in M:
-#         assert isinstance(row, (tuple, list))
-#         assert len(row) == n
+def create_new_figure(bgcolor=(0,0,0)):
+    global FIGURE
+    FIGURE = mlab.figure(bgcolor=bgcolor)
 
-# def mat_det_2d(M):
-#     assert_is_matrix(M, 2)
-#     return (M[0][0]) * (M[1][1]) - (M[1][0]) * (M[0][1])
+def plot_3d_line(X, Y, Z, label=0, mode="line", thickness=5):
+    global FIGURE
+    color = get_color(label) if label >= 0 else get_random_color()
+    if mode == "tube":
+        return mlab.plot3d(X, Y, Z, figure=FIGURE, color=color, tube_radius=thickness/10)
+    else:
+        return mlab.plot3d(X, Y, Z, figure=FIGURE, color=color, line_width=thickness)
 
-# def mat_inv_2d(M):
-#     assert mat_det_2d(M) != 0
-#     A = [[0,0],[0,0]]
-
-
+def plot_3d_points(X, Y, Z, monochromatic=True, color=(0.5,0.5,0.5), colormap="blue-red", max_size=0.1):
+    global FIGURE
+    if monochromatic:
+        return mlab.points3d(X, Y, Z, figure=FIGURE, color=color, scale_factor=max_size)
+    else:
+        return mlab.points3d(X, Y, Z, figure=FIGURE, colormap=colormap, scale_factor=max_size)
