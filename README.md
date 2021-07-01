@@ -5,6 +5,7 @@ Python programs to draw and visualize Lattice Knots and Links!
 1. matplotlib >= 3.3.4
 2. vtk >= 9.0.2
 3. mayavi >= 4.7.2
+
 The programs have been tested on the versions of the dependencies listed above, however, it may run on lower versions too.
 
 # INSTRUCTIONS
