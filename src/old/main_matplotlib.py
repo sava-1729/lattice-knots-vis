@@ -1,7 +1,9 @@
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
-from utils import *
+import sys
+sys.path.append("../")
+from src.utils import *
 
 """
 z    y (into the plane)
