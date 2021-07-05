@@ -32,6 +32,11 @@ Then the DIRECTIONS variable should look like:
 DIRECTIONS = [W, Q, S]
 """
 
-my_knot = construct_knot(DIRECTIONS)
-my_knot.plot()
-mlab.show()
+def draw_knot():
+    my_knot = construct_knot(DIRECTIONS)
+    index = 5
+    my_knot.plot(bgcolor=(0,0,0), monochromatic_sticks=True, vertex_distortion_index=index)
+    print(my_knot.vertex_distortion[index])
+    mlab.show()
+
+draw_knot()

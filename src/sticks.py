@@ -12,12 +12,14 @@ class Stick:
         self.Y = np.linspace(self.start[1], self.end[1], 3)
         self.Z = np.linspace(self.start[2], self.end[2], 3)
         self.vector = self.end - self.start
+        self.length = np.sqrt(sum((self.end - self.start) ** 2))
 
     def identify(self):
         print("Stick %d: %s, %s" % (self.id, self.start, self.end))
 
-    def plot(self, mode="line", thickness=5):
-        return plot_3d_line(self.X, self.Y, self.Z, label=self.id, mode=mode, thickness=thickness)
+    def plot(self, fix_color=False, mode="line", thickness=5):
+        label = self.id if not fix_color else -1
+        return plot_3d_line(self.X, self.Y, self.Z, label=label, mode=mode, thickness=thickness)
 
     def shares_plane_with(self, other_stick):
         assert isinstance(other_stick, Stick)

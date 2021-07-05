@@ -1,3 +1,4 @@
+from sys import excepthook
 import numpy as np
 import matplotlib.colors as mcolors
 import mayavi.mlab as mlab
@@ -35,17 +36,19 @@ def create_new_figure(bgcolor=(0,0,0)):
     global FIGURE
     FIGURE = mlab.figure(bgcolor=bgcolor)
 
-def plot_3d_line(X, Y, Z, label=0, mode="line", thickness=5):
+def plot_3d_line(X, Y, Z, label=0, mode="line", thickness=2):
     global FIGURE
-    color = get_color(label) if label >= 0 else get_random_color()
+    color = get_color(label) if label >= 0 else (0.5,0.5,0.5)
     if mode == "tube":
         return mlab.plot3d(X, Y, Z, figure=FIGURE, color=color, tube_radius=thickness/10)
     else:
         return mlab.plot3d(X, Y, Z, figure=FIGURE, color=color, line_width=thickness)
 
-def plot_3d_points(X, Y, Z, monochromatic=True, color=(0.5,0.5,0.5), colormap="blue-red", max_size=0.1):
+def plot_3d_points(X, Y, Z, scalars=None, monochromatic=True, color=(0.5,0.5,0.5), colormap="blue-red", scale_factor=0.05, mode="sphere"):
     global FIGURE
     if monochromatic:
-        return mlab.points3d(X, Y, Z, figure=FIGURE, color=color, scale_factor=max_size)
+        return mlab.points3d(X, Y, Z, figure=FIGURE, color=color, scale_factor=scale_factor, mode=mode)
+    elif scalars is not None:
+        return mlab.points3d(X, Y, Z, scalars, figure=FIGURE, colormap=colormap, scale_factor=scale_factor, mode=mode)
     else:
-        return mlab.points3d(X, Y, Z, figure=FIGURE, colormap=colormap, scale_factor=max_size)
+        raise AttributeError("Invalid Arguments to function plot_3d_points")
