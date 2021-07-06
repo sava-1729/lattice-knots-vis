@@ -9,18 +9,18 @@ z    y (into the plane)
 --------- x
 """
 
-W = np.array([0,0,1])  # +z
-A = np.array([-1,0,0]) # -x
-S = np.array([0,0,-1]) # -z
-D = np.array([1,0,0])  # +x
-Q = np.array([0,1,0])  # +y
-E = np.array([0,-1,0]) # -y
+# W = +z
+# A = -x
+# S = -z
+# D = +x
+# Q = +y
+# E = -y
 
 ###########################################
 # Edit the variable below to construct your knot!
-# The constants defined above represent unit movement in the respective directions.
+# The constants W A S D Q E shown above represent unit movement in the respective directions.
 # Replace the list below with an ordered list of directions that you want your knot to follow.
-DIRECTIONS = [D, D, D, S, E, E, A, A, Q, Q, Q, W, W, D, E, E, S, S, S, A, A, W, W]
+DIRECTIONS = [D*3, S, E*2, A*2, Q*3, W*2, D, E*2, S*3, A*2, W*2]
 # The above is a lattice conformation of the Trefoil Knot.
 ###########################################
 
@@ -34,9 +34,12 @@ DIRECTIONS = [W, Q, S]
 
 def draw_knot():
     my_knot = construct_knot(DIRECTIONS)
-    index = 5
-    my_knot.plot(bgcolor=(0,0,0), monochromatic_sticks=True, vertex_distortion_index=index)
-    print(my_knot.vertex_distortion[index])
+    index = 10
+    my_knot.plot(bgcolor=(0,0,0), stick_color=(0.5,0.5,0.5), ref_vertex_index=index)
+    print("Vertex Distortion: %f" % my_knot.vertex_distortion)
+    i, j = my_knot.vertex_distortion_pair_indices
+    print("Realized between: %s and %s" % (my_knot.vertices[i], my_knot.vertices[j]))
+    print(my_knot.distortion_ratios)
     mlab.show()
 
 draw_knot()

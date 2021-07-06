@@ -1,5 +1,6 @@
 from sys import excepthook
 import numpy as np
+from numpy.core.fromnumeric import argmax
 import matplotlib.colors as mcolors
 import mayavi.mlab as mlab
 from random import randint
@@ -36,15 +37,19 @@ def create_new_figure(bgcolor=(0,0,0)):
     global FIGURE
     FIGURE = mlab.figure(bgcolor=bgcolor)
 
-def plot_3d_line(X, Y, Z, label=0, mode="line", thickness=2):
+def plot_3d_line(X, Y, Z, label=0, color=None, mode="line", thickness=2):
     global FIGURE
-    color = get_color(label) if label >= 0 else (0.5,0.5,0.5)
+    if color is None:
+        if label >= 0:
+            color = get_color(label)
+        else:
+            color = (0.5,0.5,0.5)
     if mode == "tube":
         return mlab.plot3d(X, Y, Z, figure=FIGURE, color=color, tube_radius=thickness/10)
     else:
         return mlab.plot3d(X, Y, Z, figure=FIGURE, color=color, line_width=thickness)
 
-def plot_3d_points(X, Y, Z, scalars=None, monochromatic=True, color=(0.5,0.5,0.5), colormap="blue-red", scale_factor=0.05, mode="sphere"):
+def plot_3d_points(X, Y, Z, scalars=None, monochromatic=True, color=(0.5,0.5,0.5), colormap="blue-red", scale_factor=0.25, mode="sphere"):
     global FIGURE
     if monochromatic:
         return mlab.points3d(X, Y, Z, figure=FIGURE, color=color, scale_factor=scale_factor, mode=mode)
