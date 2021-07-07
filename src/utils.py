@@ -11,7 +11,7 @@ PRE_COLORS.remove(mcolors.BASE_COLORS["k"])
 COLORS = [mcolors.hex2color(clr) for clr in list(PRE_COLORS)]
 NUM_COLORS = len(COLORS)
 FIGURE = None
-
+COLORS = [(1,0,0),(1,0.5,0),(1,1,0),(0.5,1,0),(0,1,0),(0,1,0.5),(0,1,1),(0,0.5,1),(0,0,1),(0.5,0,1),(1,0,1),(1,0,0.5), (1,0.5,0.5), (0.5,1,0.5), (0.5,0.5,1)]+COLORS
 def get_random_color():
     global NUM_COLORS
     color = COLORS.pop(randint(0, NUM_COLORS))
@@ -49,7 +49,7 @@ def plot_3d_line(X, Y, Z, label=0, color=None, mode="line", thickness=2):
     else:
         return mlab.plot3d(X, Y, Z, figure=FIGURE, color=color, line_width=thickness)
 
-def plot_3d_points(X, Y, Z, scalars=None, monochromatic=True, color=(0.5,0.5,0.5), colormap="blue-red", scale_factor=0.25, mode="sphere"):
+def plot_3d_points(X, Y, Z, scalars=None, monochromatic=True, color=(1,1,1), colormap="blue-red", scale_factor=0.25, mode="sphere"):
     global FIGURE
     if monochromatic:
         return mlab.points3d(X, Y, Z, figure=FIGURE, color=color, scale_factor=scale_factor, mode=mode)

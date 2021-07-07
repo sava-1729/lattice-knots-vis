@@ -25,8 +25,8 @@ class StickKnot:
                     print(debug)
                     # exit()
         self.sticks = sticks
-        self.vertices = vertices
-        self.num_sticks = len(vertices)
+        self.vertices = [v for v in vertices]
+        self.num_sticks = len(self.vertices)
         self.distortion_ratios = [[1 for i in range(self.num_sticks)] for i in range(self.num_sticks)]
         for i in range(len(vertices)):
             for j in range(0, i):
