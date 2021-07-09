@@ -1,10 +1,8 @@
-from sys import excepthook
 import numpy as np
-from numpy.core.fromnumeric import argmax
 import matplotlib.colors as mcolors
 import mayavi.mlab as mlab
 from random import randint
-from math import dist, sqrt
+from math import sqrt
 
 PRE_COLORS = list(mcolors.BASE_COLORS.values()) + list(mcolors.XKCD_COLORS.values())
 PRE_COLORS.remove(mcolors.BASE_COLORS["w"])

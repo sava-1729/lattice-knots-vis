@@ -1,4 +1,3 @@
-from numpy.lib.arraysetops import isin
 from knots import *
 
 class StickLink:
