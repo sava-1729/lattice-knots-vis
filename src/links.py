@@ -12,7 +12,7 @@ class StickLink:
             knot_colors = [get_color(i) for i in range(len(self.knots))]
         create_new_figure(bgcolor=bgcolor)
         for i, knot in enumerate(self.knots):
-            knot.plot(new_figure=False, stick_color=knot_colors[i], thickness=15, highlight_vertex_distortion_pair=False)#, mode="tube")
+            knot.plot(new_figure=False, stick_color=knot_colors[i], thickness=15, highlight_vertex_distortion_pairs=False, label_vertices=False)
 
 def get_u_unknot(plane, base_center, lx, ly, lz):
     directions = None

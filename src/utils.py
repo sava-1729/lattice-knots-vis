@@ -4,6 +4,7 @@ from numpy.core.fromnumeric import argmax
 import matplotlib.colors as mcolors
 import mayavi.mlab as mlab
 from random import randint
+from math import dist, sqrt
 
 PRE_COLORS = list(mcolors.BASE_COLORS.values()) + list(mcolors.XKCD_COLORS.values())
 PRE_COLORS.remove(mcolors.BASE_COLORS["w"])
@@ -11,6 +12,7 @@ PRE_COLORS.remove(mcolors.BASE_COLORS["k"])
 COLORS = [mcolors.hex2color(clr) for clr in list(PRE_COLORS)]
 NUM_COLORS = len(COLORS)
 FIGURE = None
+COLORS = [(1,0,0),(1,0.5,0),(1,1,0),(0.5,1,0),(0,1,0),(0,1,0.5),(0,1,1),(0,0.5,1),(0,0,1),(0.5,0,1),(1,0,1),(1,0,0.5), (1,0.5,0.5), (0.5,1,0.5), (0.5,0.5,1)]+COLORS
 
 def get_random_color():
     global NUM_COLORS
@@ -36,6 +38,7 @@ def assert_is_3d_point(x):
 def create_new_figure(bgcolor=(0,0,0)):
     global FIGURE
     FIGURE = mlab.figure(bgcolor=bgcolor)
+    return FIGURE
 
 def plot_3d_line(X, Y, Z, label=0, color=None, mode="line", thickness=2):
     global FIGURE
@@ -49,7 +52,7 @@ def plot_3d_line(X, Y, Z, label=0, color=None, mode="line", thickness=2):
     else:
         return mlab.plot3d(X, Y, Z, figure=FIGURE, color=color, line_width=thickness)
 
-def plot_3d_points(X, Y, Z, scalars=None, monochromatic=True, color=(0.5,0.5,0.5), colormap="blue-red", scale_factor=0.25, mode="sphere"):
+def plot_3d_points(X, Y, Z, scalars=None, monochromatic=True, color=(1,1,1), colormap="blue-red", scale_factor=0.25, mode="sphere"):
     global FIGURE
     if monochromatic:
         return mlab.points3d(X, Y, Z, figure=FIGURE, color=color, scale_factor=scale_factor, mode=mode)
@@ -57,3 +60,42 @@ def plot_3d_points(X, Y, Z, scalars=None, monochromatic=True, color=(0.5,0.5,0.5
         return mlab.points3d(X, Y, Z, scalars, figure=FIGURE, colormap=colormap, scale_factor=scale_factor, mode=mode)
     else:
         raise AttributeError("Invalid Arguments to function plot_3d_points")
+
+def distance_2(x, y):
+    # x = np.array(x)
+    # y = np.array(y)
+    return sqrt(sum((x-y)**2))
+
+def distance_1(x, y):
+    # x = np.array(x)
+    # y = np.array(y)
+    return sum(np.absolute(x-y))
+
+def smooth_distortion(knot, num_divisions=10, mode=2):
+    N = knot.num_sticks * num_divisions
+    distortion_ratios = {}
+
+    for i in range(N):
+        stick = knot.sticks[i // num_divisions]
+        vertex_i = stick.start + ((i % num_divisions) / num_divisions) * stick.vector
+        for j in range(0, i):
+            stick = knot.sticks[j // num_divisions]
+            vertex_j = stick.start + ((j % num_divisions) / num_divisions) * stick.vector
+            try:
+                distance_along_knot = knot.distance(vertex_i, vertex_j)
+            except AssertionError:
+                print("Vertex %d: %s" % (i, vertex_i))
+                print("Vertex %d: %s" % (j, vertex_j))
+            distance_in_space = distance_2(vertex_i, vertex_j) if mode == 2 else distance_1(vertex_i, vertex_j)
+            distortion_ratios[(i,j)] = distance_along_knot / distance_in_space
+    distortion = max(distortion_ratios.values())
+    distortion_pairs = []
+    for pair in distortion_ratios.keys():
+        if distortion_ratios[pair] == distortion:
+            i, j = pair
+            stick = knot.sticks[i // num_divisions]
+            vertex_i = stick.start + ((i % num_divisions) / num_divisions) * stick.vector
+            stick = knot.sticks[j // num_divisions]
+            vertex_j = stick.start + ((j % num_divisions) / num_divisions) * stick.vector
+            distortion_pairs.append((vertex_i, vertex_j))
+    return (distortion, distortion_pairs)

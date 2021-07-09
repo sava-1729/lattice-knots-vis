@@ -35,6 +35,9 @@ class Stick:
         return all(cross == 0)
 
     def is_point_on_stick(self, point):
+        assert_is_3d_point(point)
+        if all(self.start == point):
+            return True
         on_line = self.is_parallel_to(Stick(self.start, point))
         x_in_range = point[0] <= max(self.X) and point[0] >= min(self.X)
         y_in_range = point[1] <= max(self.Y) and point[1] >= min(self.Y)
