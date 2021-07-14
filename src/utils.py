@@ -3,6 +3,7 @@ import matplotlib.colors as mcolors
 import mayavi.mlab as mlab
 from random import randint
 from math import sqrt
+from copy import deepcopy
 
 PRE_COLORS = list(mcolors.BASE_COLORS.values()) + list(mcolors.XKCD_COLORS.values())
 PRE_COLORS.remove(mcolors.BASE_COLORS["w"])
@@ -33,6 +34,12 @@ def assert_is_3d_point(x):
     for c in x:
         assert isinstance(c, (int, float)) or np.issubdtype(c, np.number), get_error_msg("Point coordinate datatype", "int or float", type(c))
 
+def are_vectors_parallel(x, y):
+    assert_is_3d_point(x)
+    assert_is_3d_point(y)
+    cross = np.cross(np.array(x), np.array(y))
+    return all(cross == 0)
+
 def create_new_figure(bgcolor=(0,0,0)):
     global FIGURE
     FIGURE = mlab.figure(bgcolor=bgcolor)
@@ -59,12 +66,12 @@ def plot_3d_points(X, Y, Z, scalars=None, monochromatic=True, color=(1,1,1), col
     else:
         raise AttributeError("Invalid Arguments to function plot_3d_points")
 
-def distance_2(x, y):
+def distance_euclidean(x, y):
     # x = np.array(x)
     # y = np.array(y)
     return sqrt(sum((x-y)**2))
 
-def distance_1(x, y):
+def distance_taxicab(x, y):
     # x = np.array(x)
     # y = np.array(y)
     return sum(np.absolute(x-y))
@@ -84,7 +91,7 @@ def smooth_distortion(knot, num_divisions=10, mode=2):
             except AssertionError:
                 print("Vertex %d: %s" % (i, vertex_i))
                 print("Vertex %d: %s" % (j, vertex_j))
-            distance_in_space = distance_2(vertex_i, vertex_j) if mode == 2 else distance_1(vertex_i, vertex_j)
+            distance_in_space = distance_euclidean(vertex_i, vertex_j) if mode == 2 else distance_taxicab(vertex_i, vertex_j)
             distortion_ratios[(i,j)] = distance_along_knot / distance_in_space
     distortion = max(distortion_ratios.values())
     distortion_pairs = []

@@ -1,11 +1,26 @@
 from sticks import *
 
+PROGRESS_UPDATES = False
+
 class StickKnot:
-    def __init__(self, vertices):
+    def __init__(self, vertices, distortion_mode="taxicab"):
         assert isinstance(vertices, (list, tuple))
-        sticks = [None for i in range(len(vertices))]
+        self.vertices = deepcopy(vertices)
+        self.critical_vertices = []
         for i in range(len(vertices)):
-            sticks[i] = Stick(vertices[i-1], vertices[i], index=i)
+            assert any(vertices[i] != vertices[i-1])
+            v_prev = [p - q for (p, q) in zip(vertices[i-1], vertices[i])]
+            v_next = [p - q for (p, q) in zip(vertices[i], vertices[(i+1) % len(vertices)])]
+            if are_vectors_parallel(v_prev, v_next):
+                continue
+            self.critical_vertices.append(vertices[i])
+        if PROGRESS_UPDATES:
+            print("############ Critical Vertices Identified ############", flush=True)
+        sticks = [None for v in self.critical_vertices]
+        for i in range(len(self.critical_vertices)):
+            sticks[i] = Stick(self.critical_vertices[i-1], self.critical_vertices[i], index=i)
+        if PROGRESS_UPDATES:
+            print("############ Stick Objects Constructed ############", flush=True)
         for i in range(len(sticks)):
             if sticks[i-1].is_parallel_to(sticks[i]):
                 if np.dot(sticks[i].vector, sticks[i-1].vector) <= 0:
@@ -24,50 +39,75 @@ class StickKnot:
                     sticks[i].identify()
                     print(debug)
                     # exit()
+        if PROGRESS_UPDATES:
+            print("############ Checked. Valid Knot. ############", flush=True)
         self.sticks = sticks
-        self.vertices = vertices
-        self.num_sticks = len(vertices)
+        self.edges = [Stick(vertices[i-1], vertices[i]) for i in range(len(vertices))]
+        self.num_sticks = len(sticks)
+        self.num_vertices = len(vertices)
         self.edge_length = sum(stick.length for stick in self.sticks)
+
+        # assert self.edge_length == self.num_vertices
         self.__analyse_distortion__()
+        if PROGRESS_UPDATES:
+            print("############ Distortion Analysis Complete ############", flush=True)
+        if distortion_mode == "taxicab":
+            self.vertex_distortion = self.vertex_distortion_taxicab
+            self.vertex_distortion_pairs = self.vertex_distortion_pairs_taxicab
+        else:
+            self.vertex_distortion = self.vertex_distortion_euclidean
+            self.vertex_distortion_pairs = self.vertex_distortion_pairs_euclidean
 
     def is_point_on_knot(self, point):
-        for i, s in enumerate(self.sticks):
+        for i, s in enumerate(self.edges):
             if s.is_point_on_stick(point):
                 return i
         return -1
 
     def distance(self, x, y):
-        x_stick_num = self.is_point_on_knot(x)
-        y_stick_num = self.is_point_on_knot(y)
-        assert x_stick_num != -1 and y_stick_num != -1
-        if x_stick_num == y_stick_num:
-            return distance_1(x, y)
-        if x_stick_num > y_stick_num:
-            x_stick_num, y_stick_num = y_stick_num, x_stick_num
+        x_edge_num = self.is_point_on_knot(x)
+        y_edge_num = self.is_point_on_knot(y)
+        assert x_edge_num != -1 and y_edge_num != -1
+        if x_edge_num == y_edge_num:
+            return distance_taxicab(x, y)
+        if x_edge_num > y_edge_num:
+            x_edge_num, y_edge_num = y_edge_num, x_edge_num
             x, y = y, x
-        dx = distance_1(x, self.sticks[x_stick_num].end)
-        dy = distance_1(self.sticks[y_stick_num].start, y)
-        delta_xy = sum(self.sticks[i].length for i in range(x_stick_num+1, y_stick_num))
+        dx = distance_taxicab(x, self.edges[x_edge_num].end)
+        dy = distance_taxicab(self.edges[y_edge_num].start, y)
+        delta_xy = sum(self.edges[i].length for i in range(x_edge_num+1, y_edge_num))
         distance_forward = dx + delta_xy + dy
         shortest_distance = min(distance_forward, self.edge_length - distance_forward)
         return shortest_distance
 
-    def __analyse_distortion__(self, mode="L1-norm"):
+    def __analyse_distortion__(self):
         distortion_ratios = {}
-        for i in range(self.num_sticks):
-            for j in range(0, i):
-                vertex_i = self.vertices[i]
-                vertex_j = self.vertices[j]
-                distance_along_knot = self.distance(vertex_i, vertex_j)
-                distance_in_space = distance_1(vertex_i, vertex_j) if mode == "L1-norm" else distance_2(vertex_i, vertex_j)
-                distortion_ratios[(i,j)] = distance_along_knot / distance_in_space
-        self.vertex_distortion = max(distortion_ratios.values())
-        self.vertex_distortion_pairs = []
+        max_knot_dist = int(self.edge_length) // 2
+        for d in range(1, max_knot_dist + 1):
+            for i in range(self.num_vertices):
+                j = (i - d) % self.num_vertices
+                if (j, i) in distortion_ratios.keys():
+                    if d != max_knot_dist:
+                        print("Strange Case.")
+                    continue
+                vertex_1 = self.vertices[i]
+                vertex_2 = self.vertices[j]
+                euclidean_distance = distance_euclidean(vertex_1, vertex_2)
+                taxicab_distance = distance_taxicab(vertex_1, vertex_2)
+                distortion_ratios[(i,j)] = {}
+                distortion_ratios[(i,j)]["euclidean"] = d / euclidean_distance
+                distortion_ratios[(i,j)]["taxicab"] = d / taxicab_distance
+        self.vertex_distortion_euclidean = max(dr["euclidean"] for dr in distortion_ratios.values())
+        self.vertex_distortion_taxicab = max(dr["taxicab"] for dr in distortion_ratios.values())
+        self.vertex_distortion_pairs_euclidean = []
+        self.vertex_distortion_pairs_taxicab = []
         for pair in distortion_ratios.keys():
-            if distortion_ratios[pair] == self.vertex_distortion:
-                self.vertex_distortion_pairs.append(pair)
+            if distortion_ratios[pair]["euclidean"] == self.vertex_distortion_euclidean:
+                self.vertex_distortion_pairs_euclidean.append(pair)
+            if distortion_ratios[pair]["taxicab"] == self.vertex_distortion_taxicab:
+                self.vertex_distortion_pairs_taxicab.append(pair)
 
-    def plot(self, bgcolor=(1,1,1), highlight_vertices=True, label_vertices=True, highlight_vertex_distortion_pairs=True, stick_color=None, ref_vertex_index=-1, thickness=5, mode="line", new_figure=True):
+    def plot(self, bgcolor=(1,1,1), highlight_vertices=0, label_vertices=True, highlight_vertex_distortion_pairs=True, stick_color=None, thickness=5, mode="line", new_figure=True, ref_vertex_index=-1):
         figure = None
         if new_figure:
             figure = create_new_figure(bgcolor=bgcolor)
@@ -77,17 +117,18 @@ class StickKnot:
                 self.stick_objs[i] = stick.plot(color=stick_color, thickness=thickness, mode=mode)
             else:
                 self.stick_objs[i] = stick.plot(thickness=thickness, mode=mode)
-        if highlight_vertices:
+        if highlight_vertices >= 0:
             if ref_vertex_index == -1:
-                self.vertex_objs = plot_3d_points(*list(zip(*self.vertices)))
+                if highlight_vertices == 0:
+                    self.vertex_objs = plot_3d_points(*list(zip(*self.critical_vertices)))
+                if highlight_vertices == 1:
+                    self.vertex_objs = plot_3d_points(*list(zip(*self.vertices)))
                 if highlight_vertex_distortion_pairs:
-                    n = 0
                     for (i, j) in self.vertex_distortion_pairs:
                         X = [self.vertices[i][0], self.vertices[j][0]]
                         Y = [self.vertices[i][1], self.vertices[j][1]]
                         Z = [self.vertices[i][2], self.vertices[j][2]]
-                        plot_3d_points(X, Y, Z, color=get_color(n), mode="cube")
-                        n += 1
+                        plot_3d_points(X, Y, Z, color=get_random_color(), mode="cube")
             else:
                 scalar_data = self.distortion_ratios[ref_vertex_index]
                 self.vertex_objs = plot_3d_points(*list(zip(*self.vertices)), scalars=scalar_data, monochromatic=False, scale_factor=1/max(scalar_data))
@@ -107,7 +148,7 @@ D = np.array([1,0,0])  # +x
 Q = np.array([0,1,0])  # +y
 E = np.array([0,-1,0]) # -y
 
-def construct_knot(directions, start=(0,0,0), unit_length_sticks=False):
+def construct_knot(directions, start=(0,0,0), distortion_mode="taxicab", unit_length_sticks=True):
     origin = np.array(start)
     vertices = [origin]
     for d in directions:
@@ -118,4 +159,9 @@ def construct_knot(directions, start=(0,0,0), unit_length_sticks=False):
                 vertices.append(vertices[-1] + d_unit)
         else:
             vertices.append(vertices[-1] + d)
-    return StickKnot(vertices)
+    last_vec = vertices[0] - vertices[-1]
+    n = int(max(np.absolute(last_vec)))
+    d_unit = last_vec / n
+    for i in range(n-1):
+        vertices.append(vertices[-1] + d_unit)
+    return StickKnot(vertices, distortion_mode)

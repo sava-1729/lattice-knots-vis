@@ -31,8 +31,7 @@ class Stick:
 
     def is_parallel_to(self, other_stick):
         assert isinstance(other_stick, Stick)
-        cross = np.cross(self.vector, other_stick.vector)
-        return all(cross == 0)
+        return are_vectors_parallel(self.vector, other_stick.vector)
 
     def is_point_on_stick(self, point):
         assert_is_3d_point(point)
