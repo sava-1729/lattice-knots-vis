@@ -16,14 +16,20 @@ z    y (into the plane)
 # Q = +y
 # E = -y
 
-###########################################
+#################################### INSTRUCTIONS #######################################
 # Edit the variable below to construct your knot!
 # The constants W A S D Q E shown above represent unit movement in the respective directions.
 # Replace the list below with an ordered list of directions that you want your knot to follow.
-DIRECTIONS = np.array([D*3, Q*2, W, A*2, E*3, S*2, D, Q*2, W*3, A*2, E])
-START = (0,0,0)
-# The above is a lattice conformation of the Trefoil Knot.
-###########################################
+#########################################################################################
+
+####################### Trefoil with varying distortion as scaled up ####################
+N = 1 # SCALE FACTOR
+DIRECTIONS = np.array([D*41, Q*2, W, A*40, E*3, S*2, D, Q*2, W*3, A*2, E]) * N
+#########################################################################################
+
+####################### Minimal Stick Lattice Conformation of Trefoil ###################
+# DIRECTIONS = np.array([D*3 Q*2, W, A*2, E*3, S*2, D, Q*2, W*3, A*2, E])
+#########################################################################################
 
 """
 !!! CAUTION !!!
@@ -33,9 +39,11 @@ Then the DIRECTIONS variable should look like:
 DIRECTIONS = [W, Q, S]
 """
 
+START = (0,0,0)
+
 def draw_knot():
     my_knot = construct_knot(DIRECTIONS, start=START, distortion_mode="taxicab")
-    my_knot.plot(bgcolor=(0,0,0), mode="tube", thickness=0.5, label_vertices=False)
+    my_knot.plot(bgcolor=(0,0,0), mode="tube", thickness=0.5, label_vertices=False, highlight_vertices=1)
     print("Edge length: %f" % my_knot.edge_length)
     print("Stick number: %f" % my_knot.num_sticks)
     print("Vertex Distortion: %f" % my_knot.vertex_distortion)
