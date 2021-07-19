@@ -1,4 +1,5 @@
 import numpy as np
+from numpy.core.fromnumeric import mean
 import matplotlib.colors as mcolors
 import mayavi.mlab as mlab
 from random import randint

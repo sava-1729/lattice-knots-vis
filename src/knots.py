@@ -108,7 +108,7 @@ class StickKnot:
                 self.vertex_distortion_pairs_taxicab.append(pair)
 
     def plot(self, bgcolor=(1,1,1), highlight_vertices=0, label_vertices=True, highlight_vertex_distortion_pairs=True, stick_color=None, thickness=5, mode="line", new_figure=True, ref_vertex_index=-1):
-        figure = None
+        figure = mlab.gcf()
         if new_figure:
             figure = create_new_figure(bgcolor=bgcolor)
         self.stick_objs = [None for i in range(len(self.sticks))]
