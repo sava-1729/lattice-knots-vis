@@ -1,10 +1,13 @@
 import numpy as np
 from numpy.core.fromnumeric import mean
 import matplotlib.colors as mcolors
+import matplotlib.cm as colormap
 import mayavi.mlab as mlab
 from random import randint
-from math import sqrt
+from math import sqrt, log2
 from copy import deepcopy
+
+from numpy.lib.arraysetops import isin
 
 PRE_COLORS = list(mcolors.BASE_COLORS.values()) + list(mcolors.XKCD_COLORS.values())
 PRE_COLORS.remove(mcolors.BASE_COLORS["w"])
@@ -49,7 +52,9 @@ def create_new_figure(bgcolor=(0,0,0)):
 def plot_3d_line(X, Y, Z, label=0, color=None, mode="line", thickness=2):
     global FIGURE
     if color is None:
-        if label >= 0:
+        if isinstance(label, float):
+            color = colormap.hsv(label)[:3]
+        elif label >= 0:
             color = get_color(label)
         else:
             color = (0.5,0.5,0.5)

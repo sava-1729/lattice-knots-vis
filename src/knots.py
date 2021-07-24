@@ -57,6 +57,14 @@ class StickKnot:
         else:
             self.vertex_distortion = self.vertex_distortion_euclidean
             self.vertex_distortion_pairs = self.vertex_distortion_pairs_euclidean
+        self.distortion_mode = distortion_mode
+        self.__setup_colors__()
+
+    def __setup_colors__(self):
+        l = 0
+        for s in self.sticks:
+            s.id = l/(self.edge_length)
+            l += s.length
 
     def is_point_on_knot(self, point):
         for i, s in enumerate(self.edges):
@@ -106,11 +114,16 @@ class StickKnot:
                 self.vertex_distortion_pairs_euclidean.append(pair)
             if distortion_ratios[pair]["taxicab"] == self.vertex_distortion_taxicab:
                 self.vertex_distortion_pairs_taxicab.append(pair)
+        self.distortion_ratios = distortion_ratios
 
-    def plot(self, bgcolor=(1,1,1), highlight_vertices=0, label_vertices=True, highlight_vertex_distortion_pairs=True, stick_color=None, thickness=5, mode="line", new_figure=True, ref_vertex_index=-1):
-        figure = mlab.gcf()
+    def plot(self, bgcolor=(1,1,1), highlight_vertices=0, label_vertices=True, highlight_vertex_distortion_pairs=True, stick_color=None, thickness=5, mode="line", new_figure=True, ref_vertex_index=-1, highlight_high_distortion_pairs=False):
+        figure = None
         if new_figure:
             figure = create_new_figure(bgcolor=bgcolor)
+        else:
+            figure = mlab.gcf()
+        if highlight_high_distortion_pairs:
+            stick_color = (0.5,0.5,0.5)
         self.stick_objs = [None for i in range(len(self.sticks))]
         for i, stick in enumerate(self.sticks):
             if stick_color is not None:
@@ -119,18 +132,47 @@ class StickKnot:
                 self.stick_objs[i] = stick.plot(thickness=thickness, mode=mode)
         if highlight_vertices >= 0:
             if ref_vertex_index == -1:
-                if highlight_vertices == 0:
-                    self.vertex_objs = plot_3d_points(*list(zip(*self.critical_vertices)))
-                if highlight_vertices == 1:
-                    self.vertex_objs = plot_3d_points(*list(zip(*self.vertices)))
-                if highlight_vertex_distortion_pairs:
-                    for (i, j) in self.vertex_distortion_pairs:
-                        X = [self.vertices[i][0], self.vertices[j][0]]
-                        Y = [self.vertices[i][1], self.vertices[j][1]]
-                        Z = [self.vertices[i][2], self.vertices[j][2]]
-                        plot_3d_points(X, Y, Z, color=get_random_color(), mode="cube")
+                if highlight_high_distortion_pairs:
+                    labels = ["" for i in range(self.num_vertices)]
+                    scalar_data = [0 for i in range(self.num_vertices)]
+                    for i in range(self.num_vertices):
+                        i_dist_ratios = [d[self.distortion_mode] for (pair, d) in self.distortion_ratios.items() if i in pair]
+                        i_partners = [sum(pair)-i for pair in self.distortion_ratios.keys() if i in pair]
+                        scalar_data[i] = max(i_dist_ratios)
+                        j = i_partners[i_dist_ratios.index(scalar_data[i])]
+                        labels[i] = "(%d, %d)" % (i, j)
+                    vertex_objs = plot_3d_points(*list(zip(*self.vertices)), scalars=scalar_data, monochromatic=False, scale_factor=0.5/max(scalar_data))
+                    mlab.colorbar(object=vertex_objs, title="High Vertex Distortion Ratios", orientation="vertical")
+                    if label_vertices:
+                        figure.scene.disable_render = True
+                        for i, v in enumerate(self.vertices):
+                            mlab.text3d(v[0], v[1]+0.2, v[2], labels[i], scale=(0.15,0.15,0.15),color=(0.5,0.5,0.5))
+                        figure.scene.disable_render = False
+                        label_vertices = False
+                else:
+                    if highlight_vertices == 0:
+                        self.vertex_objs = plot_3d_points(*list(zip(*self.critical_vertices)))
+                    if highlight_vertices == 1:
+                        self.vertex_objs = plot_3d_points(*list(zip(*self.vertices)))
+                    if highlight_vertex_distortion_pairs:
+                        for (i, j) in self.vertex_distortion_pairs:
+                            X = [self.vertices[i][0], self.vertices[j][0]]
+                            Y = [self.vertices[i][1], self.vertices[j][1]]
+                            Z = [self.vertices[i][2], self.vertices[j][2]]
+                            plot_3d_points(X, Y, Z, color=get_random_color(), mode="cube")
             else:
-                scalar_data = self.distortion_ratios[ref_vertex_index]
+                scalar_data = [1 for i in range(self.num_vertices)]
+                for i in range(self.num_vertices):
+                    key = None
+                    if (i, ref_vertex_index) in self.distortion_ratios.keys():
+                        key = (i, ref_vertex_index)
+                    elif (ref_vertex_index, i) in self.distortion_ratios.keys():
+                        key = (ref_vertex_index, i)
+                    else:
+                        print("Distortion Ratio not found! Pair: (%d, %d)" % (i, ref_vertex_index))
+                        continue
+                    scalar_data[i] = self.distortion_ratios[key][self.distortion_mode]
+                print("Scalar data: %s" % scalar_data)
                 self.vertex_objs = plot_3d_points(*list(zip(*self.vertices)), scalars=scalar_data, monochromatic=False, scale_factor=1/max(scalar_data))
                 vertex = self.vertices[ref_vertex_index]
                 plot_3d_points([vertex[0]], [vertex[1]], [vertex[2]], color=(1,1,1), scale_factor=0.5, mode="cube")
@@ -138,7 +180,7 @@ class StickKnot:
             if label_vertices and figure is not None:
                 figure.scene.disable_render = True
                 for i, v in enumerate(self.vertices):
-                    mlab.text3d(v[0], v[1], v[2], str(i), scale=(0.25,0.25,0.25),color=(0.5,0.5,0.5))
+                    mlab.text3d(v[0], v[1]+0.25, v[2], str(i), scale=(0.15,0.15,0.15),color=(0.5,0.5,0.5))
                 figure.scene.disable_render = False
 
 W = np.array([0,0,1])  # +z
@@ -148,20 +190,22 @@ D = np.array([1,0,0])  # +x
 Q = np.array([0,1,0])  # +y
 E = np.array([0,-1,0]) # -y
 
-def construct_knot(directions, start=(0,0,0), distortion_mode="taxicab", unit_length_sticks=True):
+def construct_knot(directions, start=(0,0,0), distortion_mode="taxicab", unit_length_sticks=True, div = 1):
     origin = np.array(start)
     vertices = [origin]
     for d in directions:
         if unit_length_sticks:
-            n = int(max(np.absolute(d)))
+            n = int(max(np.absolute(d))) * div
             d_unit = d / n
             for i in range(n):
                 vertices.append(vertices[-1] + d_unit)
         else:
             vertices.append(vertices[-1] + d)
     last_vec = vertices[0] - vertices[-1]
-    n = int(max(np.absolute(last_vec)))
+    n = int(max(np.absolute(last_vec))) * div
     d_unit = last_vec / n
     for i in range(n-1):
         vertices.append(vertices[-1] + d_unit)
+    # if temp_flag:
+    # vertices = list(np.array(vertices)/div)
     return StickKnot(vertices, distortion_mode)
