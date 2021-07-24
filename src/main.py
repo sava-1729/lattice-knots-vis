@@ -30,7 +30,7 @@ z    y (into the plane)
 
 ######################### 10.5-vd Lattice Conformation of Trefoil #####################
 N = 1
-DIRECTIONS = [D*9, Q*6, W*4, A*5, E*3, A*1, E*2, D*1, E*5, S*8, Q*8, W*4, D*1, W*1, D*1, W*1, D*1, E*2, W*6, A*7, E*2]*N
+DIRECTIONS = np.array([D*9, Q*6, W*4, A*5, E*3, A*1, E*2, D*1, E*5, S*8, Q*8, W*4, D*1, W*1, D*1, W*1, D*1, E*2, W*6, A*7, E*2])*N
 
 ##################### Trefoil with varying 1-distortion as scaled up ####################
 # N = 3
