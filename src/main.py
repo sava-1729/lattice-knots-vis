@@ -22,15 +22,58 @@ z    y (into the plane)
 # Replace the list below with an ordered list of directions that you want your knot to follow.
 ##############################################################################################
 
+DIRECTIONS = []
+
+###################################### TORUS KNOTS ###########################################
+
+################################## K_p (Campisi-Cazet) #######################################
+P = 25
+def get_torus_param(P):
+    DIRECTIONS = []
+    x_len = 2
+    sign = 1
+    for i in range(1, 2*P - 1):
+        y_len = (P - 1) if i % 2 == 1 else P
+        DIRECTIONS.append(sign * W * (2*P - i))
+        DIRECTIONS.append(sign * D * x_len)
+        DIRECTIONS.append(sign * Q * y_len)
+        if i % 2 == 1:
+            x_len += 1
+        sign = -sign
+    DIRECTIONS.append(sign * W * 1)
+    DIRECTIONS.append(sign * D * P)
+    DIRECTIONS.append(sign * Q * (2*P - 1))
+    sign = -sign
+    DIRECTIONS.append(sign * W * P)
+    DIRECTIONS.append(sign * D * 1)
+    return DIRECTIONS
+DIRECTIONS = get_torus_param(P)
+
+################################### Toroidal Unknot ########################################
+# DIRECTIONS = [D, Q, S, D, E, W, D, Q*2, A, S, Q, D, W, Q, A*2, E, S, A, Q, W, A, E*2, D, S, E, A, W, E]
+# N = 30
+# DIRECTIONS = []
+# for i in range(N):
+#     DIRECTIONS = DIRECTIONS + [D, Q, S, D, E, W, D]
+# DIRECTIONS.append(Q)
+# for i in range(N):
+#     DIRECTIONS = DIRECTIONS + [Q, A, S, Q, D, W, Q]
+# DIRECTIONS.append(A)
+# for i in range(N):
+#     DIRECTIONS = DIRECTIONS + [A, E, S, A, Q, W, A]
+# DIRECTIONS.append(E)
+# for i in range(N):
+#     DIRECTIONS = DIRECTIONS + [E, D, S, E, A, W, E]
+
 ####################################### TREFOILS #############################################
 
 ####################### Minimal Stick Lattice Conformation of Trefoil ###################
-# N = 1
+# N = 2
 # DIRECTIONS = np.array([D*3, Q*2, W, A*2, E*3, S*2, D, Q*2, W*3, A*2, E])*N
 
 ######################### 10.5-vd Lattice Conformation of Trefoil #####################
-N = 1
-DIRECTIONS = np.array([D*9, Q*6, W*4, A*5, E*3, A*1, E*2, D*1, E*5, S*8, Q*8, W*4, D*1, W*1, D*1, W*1, D*1, E*2, W*6, A*7, E*2])*N
+# N = 1
+# DIRECTIONS = np.array([D*9, Q*6, W*4, A*5, E*3, A*1, E*2, D*1, E*5, S*8, Q*8, W*4, D*1, W*1, D*1, W*1, D*1, E*2, W*6, A*7, E*2])*N
 
 ##################### Trefoil with varying 1-distortion as scaled up ####################
 # N = 3
@@ -76,9 +119,9 @@ DIRECTIONS = [W, Q, S]
 
 START = (0,0,0)
 
-def draw_knot(dir=DIRECTIONS, new_figure=True, show=True):
-    my_knot = construct_knot(dir, start=START, distortion_mode="taxicab")
-    my_knot.plot(bgcolor=(0,0,0), mode="tube", thickness=0.5, label_vertices=False, highlight_vertices=1, highlight_vertex_distortion_pairs=True, new_figure=new_figure, highlight_high_distortion_pairs=False, ref_vertex_index=-1, stick_color=None)
+def draw_knot(dir=DIRECTIONS, start=START, new_figure=True, show=True):
+    my_knot = construct_knot(dir, start=start, distortion_mode="taxicab")
+    my_knot.plot(bgcolor=(1,1,1), mode="tube", thickness=1, label_vertices=False, highlight_vertices=-1, highlight_vertex_distortion_pairs=True, new_figure=new_figure, highlight_high_distortion_pairs=False, ref_vertex_index=-1, stick_color=None)
     print("Edge length: %f" % my_knot.edge_length)
     print("Stick number: %f" % my_knot.num_sticks)
     print("Euclidean Vertex Distortion: %f" % my_knot.vertex_distortion_euclidean)
@@ -118,7 +161,28 @@ def analyse_2_distortion_of_knot_scalings(knot_name, max_scale_factor=64):
     axs[1].grid(color='tab:gray', linestyle="--")
     plt.show()
 
-draw_knot()
+draw_knot(DIRECTIONS)
+
+# start = (0,0,0)
+# P_max = 10
+# for p in range(3, P_max+1):
+#     start = (start[0] + p + (p//2), 0, 0)
+#     draw_knot(get_torus_param(p), new_figure=(p==3), start=start, show=(p==P_max))
+
+# my_knot = construct_knot(DIRECTIONS, start=START, distortion_mode="taxicab")
+
+# d1_distances_between_antipodals = []
+# for i in range(my_knot.num_vertices//2):
+#     x = my_knot.vertices[i]
+#     y = my_knot.vertices[i - (my_knot.num_vertices//2)]
+#     print((x,y))
+#     d1_distances_between_antipodals.append(distance_taxicab(x, y))
+
+# print(d1_distances_between_antipodals)
+# print(sum(d1_distances_between_antipodals))#/len(d1_distances_between_antipodals))
+# print(my_knot.edge_length)
+
+
 # analyse_2_distortion_of_knot_scalings("Max-Cubed Unknot")#, max_scale_factor=40)
 # k1 = construct_knot(DIRECTIONS, start=START, div=2)
 
