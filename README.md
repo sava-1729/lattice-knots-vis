@@ -2,13 +2,26 @@
 Python programs to draw and visualize Lattice Knots and Links!
 
 # DEPENDENCIES
-1. matplotlib >= 3.3.4
-2. vtk >= 9.0.2
-3. mayavi >= 4.7.2
+1. numpy >= 1.21.0
+2. matplotlib >= 3.3.4
+3. vtk >= 9.0.2
+4. mayavi >= 4.7.2
 
 The programs have been tested on the versions of the dependencies listed above, however, it may run on lower versions too.
 
-# INSTRUCTIONS
-Modify the `DIRECTIONS` variable in the main.py file and run it in order to plot your knot.
+# INSTRUCTIONS TO INSTALL DEPENDENCIES
+1. Install Miniconda (preferred) with Python 3.7
+https://docs.conda.io/en/latest/miniconda.html
+2. Install numpy
+conda install -c anaconda numpy
+3. Install matplotlib
+conda install -c conda-forge matplotlib 
+4. Install vtk
+conda install -c conda-forge vtk
+5. Install mayavi
+conda install -c conda-forge mayavi
 
-If you are unable to install MayaVi, you can use main_matplotlib.py, which does not use the MayaVi library. However, the plots made using matplotlib seem to have an incorrect view order (some farther objects appear in front of nearer objects, and vice versa).
+# INSTRUCTIONS TO RUN THE CODE
+1. Modify the `DIRECTIONS` variable in the main.py file
+2. Comment out the other definitions of the `DIRECTIONS` variable
+3. Run `main.py` inside anaconda prompt in order to draw your knot.
