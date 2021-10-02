@@ -1,5 +1,5 @@
 # BRIEF
-Python programs to draw and visualize Lattice Knots and Links!
+Python programs to visualize Lattice Knots and Links in 3D, and compute invariants such as stick number, edge length, and vertex distortion.
 
 # DEPENDENCIES
 1. numpy >= 1.21.0
