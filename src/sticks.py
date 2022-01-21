@@ -7,7 +7,7 @@ class Stick:
         self.start = np.array(start)
         self.end = np.array(end)
         self.id = index
-        assert any(self.start != self.end)
+        assert any(self.start != self.end), ("Index %d, Start %s, End %s" % (index, start, end))
         self.X = np.linspace(self.start[0], self.end[0], 3)
         self.Y = np.linspace(self.start[1], self.end[1], 3)
         self.Z = np.linspace(self.start[2], self.end[2], 3)

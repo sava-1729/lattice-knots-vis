@@ -27,7 +27,7 @@ DIRECTIONS = []
 ###################################### TORUS KNOTS ###########################################
 
 ################################## K_p (Campisi-Cazet) #######################################
-P = 25
+P = 10
 def get_torus_param(P):
     DIRECTIONS = []
     x_len = 2
@@ -68,19 +68,27 @@ DIRECTIONS = get_torus_param(P)
 ####################################### TREFOILS #############################################
 
 ####################### Minimal Stick Lattice Conformation of Trefoil ###################
-# N = 2
+# N = 25
 # DIRECTIONS = np.array([D*3, Q*2, W, A*2, E*3, S*2, D, Q*2, W*3, A*2, E])*N
 
 ######################### 10.5-vd Lattice Conformation of Trefoil #####################
-# N = 1
+# N = 5
 # DIRECTIONS = np.array([D*9, Q*6, W*4, A*5, E*3, A*1, E*2, D*1, E*5, S*8, Q*8, W*4, D*1, W*1, D*1, W*1, D*1, E*2, W*6, A*7, E*2])*N
+
+######################### 10.33-vd Lattice Conformation of Trefoil #####################
+# N = 1
+# DIRECTIONS = np.array([D*8, Q*5, W*4, A*5, E*5, D, E*4, S*8, Q*8, W*5, E, D, W, D, E, W, D, E, W*5, A*7, E*1])*N
 
 ##################### Trefoil with varying 1-distortion as scaled up ####################
 # N = 3
 # DIRECTIONS = np.array([D*31, Q*2, W, A*30, E*3, S*2, D, Q*2, W*3, A*2, E])*N
 
+################################### David's Trefoil ######################################
+# N = 1
+# DIRECTIONS = np.array([D * 32, Q * 21, W * 10, A * 21, E * 32, S * 21, D * 10, Q * 21, W * 32, A * 21, E * 10])*N
+
 ######################### 44-edge, 11-vd Lattice Conformation of Trefoil #####################
-# N = 2
+# N = 1
 # DIRECTIONS = np.array([D*5, Q*3, W*2, A*3, E*5, S*4, Q*4, W*2, D, W, D, E, W*3, A*4, E])*N
 
 ################################# Curvy Trefoil 4 ############################################
@@ -90,16 +98,26 @@ DIRECTIONS = get_torus_param(P)
 ####################################### UNKNOTS #############################################
 
 ##################################### Minimal Unknot ####################################
-# N = 8
+# N = 1
 # DIRECTIONS = np.array([D, W, A]) *N
 
 ############################### Non-trivial VD-1 Unknot #################################
-# N = 5
+# N = 2
 # DIRECTIONS = np.array([D, W, Q, A, S])*N
 
 ########################## 1-distortion constant on scaling #############################
 # N = 2
 # DIRECTIONS = np.array([D, Q, A, S, E, D, E, W, A])*N
+#########################################################################################
+
+##################################### Rectangle #####################################
+# N = 6
+# DIRECTIONS = np.array([D*N, W, A*N])
+#########################################################################################
+
+##################################### Two L's #####################################
+# N = 20
+# DIRECTIONS = np.array([D*N, W*N*2, A*N*2, S*N, A*N, S*N*2, D*N*2])
 #########################################################################################
 
 ####################################### FIGURE 8 #############################################
@@ -108,6 +126,92 @@ DIRECTIONS = get_torus_param(P)
 # N = 1
 # DIRECTIONS = np.array([D, Q*2, W*2, E*3, A*2, Q*4, D*3, S, E*2, A*2, Q*3, W*2, E*4])*N
 ###########################################################################################################
+
+########################## Replicating Standard Smooth Conformation ##########################
+# N = 1
+# DIRECTIONS = np.array([D, W*2, D*2, Q*6, A*7, S, E*7, D*6, Q*2, A*3, S, E*5, D*6, W*3, Q*7, A*5, S*3])*N
+###########################################################################################################
+# N = 1
+# DIRECTIONS = np.array([D*2, Q*6, S*2, A*2, S*2, E*6, D*2, E*6, W*2, A*2, W*2])*N
+
+########################## Twisted Brunnian 3-link ##########################
+# components = [None, None, None]
+# starts = [None, None, None]
+# components[0] = np.array([D*8, Q*4, A*8])
+# starts[0] = (0,0,0)
+# components[1] = np.array([Q*5, D*4, E*5, S*2, Q*5, A*4, E*5])
+# starts[1] = (2,3,1)
+# components[2] = np.array([Q*6, S*2, E*6])
+# starts[2] = (4,-1,1)
+
+########################## Brunnian 3-link + extra-link ##########################
+# components = [None, None, None, None]
+# starts = [None, None, None, None]
+# components[0] = np.array([D*4, Q*4, W*4, A*4, S*4])
+# starts[0] = (0,0,0)
+# components[1] = np.array([D*6, S*2, A*6])
+# starts[1] = (-1,2,1)
+# components[2] = np.array([D*6, Q*2, A*6])
+# starts[2] = (-1,3,2)
+# components[3] = np.array([Q*6, S*6, E*6])
+# starts[3] = (2,1,3)
+
+########################## Supposed Brunnian 4-link ##########################
+# components = [None, None, None, None]
+# starts = [None, None, None, None]
+# components[0] = np.array([D*4, Q*4, W*4, A*4, S*4])
+# starts[0] = (0,0,0)
+# components[1] = np.array([D*6, S*2, A*6])
+# starts[1] = (-1,2,1)
+# components[2] = np.array([D*6, Q*2, A*6])
+# starts[2] = (-1,3,2)
+# components[3] = np.array([Q*6, S*6, E*6])
+# starts[3] = (2,1,3)
+
+######################### Brunnian 3-link with odd stick number ##########################
+# components = [None, None, None]
+# starts = [None, None, None]
+# components[0] = np.array([E*4, S*2, D*3, Q*2, W, D, Q*2, A*4])
+# starts[0] = (0,0,0)
+# components[1] = np.array([W*4, D*6, S*4])
+# starts[1] = (-1,-2,-3)
+# components[2] = np.array([E*2, S*6, Q*2])
+# starts[2] = (2,-1, 2)
+
+# # BEST
+# DIRECTIONS = np.array([D* 245, Q* 158, S* 71, A* 158, E* 245, W* 158, D* 71, Q* 158, S* 245, A* 158, E* 71])
+
+#########################################
+# A generic trefoil conformation. This cannot have distortion less than 11
+# 11 is achieved iff b = 2a
+
+# a = 30
+# b = 70
+# b must be bigger than a
+
+# DIRECTIONS = np.array([D*b, Q*a, S*(a+b), A*a, E*b, W*b, Q*(a+b), D*a*2, S*a, E*a*2, A*(a+b)])
+#########################################
+
+#########################################
+# Another generic trefoil conformation. This cannot have distortion less than 9.89897948557...
+# Minima is achieved iff b/a = 1+sqrt(1.5)
+
+# a = 4
+# b = 9
+# # b must be bigger than a
+
+# DIRECTIONS = np.array([D*(2*b-a), Q*b + Q, S*a, A*b, E*(2*b-a) + E, W*b, D*a, Q*b + Q, S*(2*b-a), A*b, E*a + E])
+#########################################
+
+################ c > b < a #################
+# a = 2
+# b = 1
+# c = 2
+
+
+# DIRECTIONS = np.array([D*a, Q*b, S*(a+c-b), A*b, E*c, W*a, Q*(a+c-b), D*c, S*b, E*a, A*(a+c-b)])
+# DIRECTIONS = np.array([D*(a-b+c), Q*c, S*b, A*a, E*(a-b+c), W*c, D*b, Q*a, S*(a-b+c), A*c, E*b])
+#########################################
 
 """
 !!! CAUTION !!!
@@ -118,26 +222,29 @@ DIRECTIONS = [W, Q, S]
 """
 
 START = (0,0,0)
+SHOW = True
 
-def draw_knot(dir=DIRECTIONS, start=START, new_figure=True, show=True):
-    my_knot = construct_knot(dir, start=start, distortion_mode="taxicab")
-    my_knot.plot(bgcolor=(1,1,1), mode="tube", thickness=1, label_vertices=False, highlight_vertices=-1, highlight_vertex_distortion_pairs=True, new_figure=new_figure, highlight_high_distortion_pairs=False, ref_vertex_index=-1, stick_color=None)
+def draw_knot(dir=DIRECTIONS, start=START, new_figure=True, show=SHOW, div=1, color=None):
+    my_knot = construct_knot(dir, start=start, distortion_mode="taxicab", div=div)
     print("Edge length: %f" % my_knot.edge_length)
     print("Stick number: %f" % my_knot.num_sticks)
+    print("Vertex Distortion: %f" % my_knot.vertex_distortion)
     print("Euclidean Vertex Distortion: %f" % my_knot.vertex_distortion_euclidean)
     print("Taxicab Vertex Distortion: %f" % my_knot.vertex_distortion_taxicab)
     print("Vertex Distortion Pairs:")
     for i, j in my_knot.vertex_distortion_pairs:
         print("(%d, %d) = %s and %s" % (i, j, my_knot.vertices[i], my_knot.vertices[j]))
     if show:
+        my_knot.plot(bgcolor=(0,0,0), mode="tube", thickness=0.5, label_vertices=False, highlight_vertices=1, highlight_vertex_distortion_pairs=False, new_figure=new_figure, highlight_high_distortion_pairs=True, ref_vertex_index=-1, stick_color=(0,0,0))
         mlab.show()
+    return my_knot
 
-def analyse_2_distortion_of_knot_scalings(knot_name, max_scale_factor=64):
+def analyse_2_distortion_of_knot_scalings(knot_name, max_scale_factor=20):
     vds = []
     vd_pair_dist_avg = []
     for N in range(1, max_scale_factor+1):
         dn = DIRECTIONS*N #(2**N)
-        my_knot = construct_knot(dn, start=START, distortion_mode="euclidean", div=8)
+        my_knot = construct_knot(dn, start=START, distortion_mode="taxicab")#, div=8)
         vds.append(my_knot.vertex_distortion)
         vertex_distortion_pair_distance = []
         for i, j in my_knot.vertex_distortion_pairs:
@@ -161,15 +268,35 @@ def analyse_2_distortion_of_knot_scalings(knot_name, max_scale_factor=64):
     axs[1].grid(color='tab:gray', linestyle="--")
     plt.show()
 
-draw_knot(DIRECTIONS)
+def draw_link(components, starts):
+    knot_cmps = []
+    for i, knot in enumerate(components):
+        knot_cmps.append(draw_knot(dir=knot, start=starts[i], new_figure=(i==0), color=colormap.hsv(i/len(components))[:3], show=False))
+    print("Stick Number: %d" % sum([k.num_sticks for k in knot_cmps]))
+    print("Edge Length: %d" % sum([k.edge_length for k in knot_cmps]))
+    mlab.show()
 
+# draw_link(components, starts)
+draw_knot(DIRECTIONS, div=5)
+# my_knot = draw_knot(DIRECTIONS, show=False)
+# dist = my_knot.distance(my_knot.vertices[0]+np.array([0.5,0,0]),my_knot.vertices[0]+np.array([0.5,0,-4]))
+# print("DISTANCE between midpoints: %f" % dist)
+# dist = my_knot.distance(my_knot.vertices[0]+np.array([0.5,0,0]),my_knot.vertices[0]+np.array([0.5,0,-4]))
+# print("DISTANCE between midpoints: %f" % dist)
+# draw_knot(DIRECTIONS, start=(4,0,0), new_figure=False, div=2, show=False)
+
+# draw_knot(DIRECTIONS, start=(8,0,0), new_figure=False, div=4)
+
+# draw_knot()
 # start = (0,0,0)
 # P_max = 10
 # for p in range(3, P_max+1):
 #     start = (start[0] + p + (p//2), 0, 0)
 #     draw_knot(get_torus_param(p), new_figure=(p==3), start=start, show=(p==P_max))
 
-# my_knot = construct_knot(DIRECTIONS, start=START, distortion_mode="taxicab")
+# create_new_figure()
+# my_knot = draw_knot(DIRECTIONS, start=(0,0,0), show=False, new_figure=False)
+# my_knot = draw_knot(DIRECTIONS*2, start=(8,0,0), new_figure=False)
 
 # d1_distances_between_antipodals = []
 # for i in range(my_knot.num_vertices//2):

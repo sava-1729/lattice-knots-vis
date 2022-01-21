@@ -1,13 +1,11 @@
-import numpy as np
-from numpy.core.fromnumeric import mean
-import matplotlib.colors as mcolors
-import matplotlib.cm as colormap
-import mayavi.mlab as mlab
+from math import sqrt
 from random import randint
-from math import sqrt, log2
-from copy import deepcopy
 
-from numpy.lib.arraysetops import isin
+import matplotlib.cm as colormap
+import matplotlib.colors as mcolors
+import mayavi.mlab as mlab
+import numpy as np
+from copy import deepcopy
 
 PRE_COLORS = list(mcolors.BASE_COLORS.values()) + list(mcolors.XKCD_COLORS.values())
 PRE_COLORS.remove(mcolors.BASE_COLORS["w"])
