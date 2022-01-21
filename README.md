@@ -1,5 +1,9 @@
 # BRIEF
-Python programs to visualize Lattice Knots and Links in 3D, and compute invariants such as stick number, edge length, and vertex distortion.
+Python module to visualize Lattice Knots and Links in 3D, and analyse their distortion.
+
+# PREVIEW
+High Distortion vertices of the Minimal Stick Trefoil (25x)
+![alt text](https://github.com/sava-1729/lattice-knots-vis/blob/main/img/taxicab_distortion_preview.png?raw=true)
 
 # DEPENDENCIES
 1. numpy >= 1.21.0
