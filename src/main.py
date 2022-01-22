@@ -1,3 +1,6 @@
+from math import log2
+
+from numpy import mean
 from knots import *
 
 """
@@ -27,28 +30,29 @@ DIRECTIONS = []
 ###################################### TORUS KNOTS ###########################################
 
 ################################## K_p (Campisi-Cazet) #######################################
-P = 10
-def get_torus_param(P):
-    DIRECTIONS = []
-    x_len = 2
-    sign = 1
-    for i in range(1, 2*P - 1):
-        y_len = (P - 1) if i % 2 == 1 else P
-        DIRECTIONS.append(sign * W * (2*P - i))
-        DIRECTIONS.append(sign * D * x_len)
-        DIRECTIONS.append(sign * Q * y_len)
-        if i % 2 == 1:
-            x_len += 1
-        sign = -sign
-    DIRECTIONS.append(sign * W * 1)
-    DIRECTIONS.append(sign * D * P)
-    DIRECTIONS.append(sign * Q * (2*P - 1))
-    sign = -sign
-    DIRECTIONS.append(sign * W * P)
-    DIRECTIONS.append(sign * D * 1)
-    return DIRECTIONS
-DIRECTIONS = get_torus_param(P)
+# P = 20
+# def get_torus_param(P):
+#     DIRECTIONS = []
+#     x_len = 2
+#     sign = 1
+#     for i in range(1, 2*P - 1):
+#         y_len = (P - 1) if i % 2 == 1 else P
+#         DIRECTIONS.append(sign * W * (2*P - i))
+#         DIRECTIONS.append(sign * D * x_len)
+#         DIRECTIONS.append(sign * Q * y_len)
+#         if i % 2 == 1:
+#             x_len += 1
+#         sign = -sign
+#     DIRECTIONS.append(sign * W * 1)
+#     DIRECTIONS.append(sign * D * P)
+#     DIRECTIONS.append(sign * Q * (2*P - 1))
+#     sign = -sign
+#     DIRECTIONS.append(sign * W * P)
+#     DIRECTIONS.append(sign * D * 1)
+#     return DIRECTIONS
+# DIRECTIONS = get_torus_param(P)
 
+# print("Knot Directions defined")
 ################################### Toroidal Unknot ########################################
 # DIRECTIONS = [D, Q, S, D, E, W, D, Q*2, A, S, Q, D, W, Q, A*2, E, S, A, Q, W, A, E*2, D, S, E, A, W, E]
 # N = 30
@@ -229,11 +233,11 @@ def draw_knot(dir=DIRECTIONS, start=START, new_figure=True, show=SHOW, div=1, co
     print("Edge length: %f" % my_knot.edge_length)
     print("Stick number: %f" % my_knot.num_sticks)
     print("Vertex Distortion: %f" % my_knot.vertex_distortion)
-    print("Euclidean Vertex Distortion: %f" % my_knot.vertex_distortion_euclidean)
-    print("Taxicab Vertex Distortion: %f" % my_knot.vertex_distortion_taxicab)
+    # print("Euclidean Vertex Distortion: %f" % my_knot.vertex_distortion_euclidean)
+    # print("Taxicab Vertex Distortion: %f" % my_knot.vertex_distortion_taxicab)
     print("Vertex Distortion Pairs:")
     for i, j in my_knot.vertex_distortion_pairs:
-        print("(%d, %d) = %s and %s" % (i, j, my_knot.vertices[i], my_knot.vertices[j]))
+        print("(%d, %d) = %s and %s" % (i, j, my_knot.vertices[i], my_knot.vertices[j]), end=" ")
     if show:
         my_knot.plot(bgcolor=(0,0,0), mode="tube", thickness=0.5, label_vertices=False, highlight_vertices=1, highlight_vertex_distortion_pairs=False, new_figure=new_figure, highlight_high_distortion_pairs=True, ref_vertex_index=-1, stick_color=(0,0,0))
         mlab.show()
@@ -277,7 +281,7 @@ def draw_link(components, starts):
     mlab.show()
 
 # draw_link(components, starts)
-draw_knot(DIRECTIONS, div=5)
+draw_knot(DIRECTIONS, show=True) #, div=5)
 # my_knot = draw_knot(DIRECTIONS, show=False)
 # dist = my_knot.distance(my_knot.vertices[0]+np.array([0.5,0,0]),my_knot.vertices[0]+np.array([0.5,0,-4]))
 # print("DISTANCE between midpoints: %f" % dist)

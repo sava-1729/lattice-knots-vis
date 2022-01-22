@@ -6,6 +6,9 @@ import matplotlib.colors as mcolors
 import mayavi.mlab as mlab
 import numpy as np
 from copy import deepcopy
+from time import perf_counter
+
+
 
 PRE_COLORS = list(mcolors.BASE_COLORS.values()) + list(mcolors.XKCD_COLORS.values())
 PRE_COLORS.remove(mcolors.BASE_COLORS["w"])
