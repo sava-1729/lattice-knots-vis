@@ -1,0 +1,31 @@
+# Refactor StickKnot class:
+    > reimplement knot validation using numpy, make separate function for this
+    > reimplement identification of critical vertices
+    > implement distortion for non-lattice stick knots using numpy 
+    > implement an exclusive lattice mode in StickKnot class (so that distortion calculation & knot validation is faster for lattice knots)
+    > reimplement plot() function using numpy, preserve all features:
+        > supply vertices to plot3d() in order to plot knot sticks - DONE
+        > use mlab's colormap with scalar_mode='none' to color the knot sticks (all matplotlib colormap names work!!!) - DONE
+        > use color range to color only specific vertices with distortion in a certain range
+        > $ construct a visualization of the distortion function using a colored torus $ - DONE
+    > merge construct_knot with StickKnot, allow vertices / directions both in the constructor, identify using a flag (as an optional argument)
+    > reimplement coloring of knots - DONE
+    > implement read/write from/to a yaml file to maintain knot parameterizations
+        > allow users to load their own yaml files
+        > list all the available knots and ask which one(s) to plot - accept a comma separated list of indices
+        > allow plotting multiple knots in the same figure
+
+# Refactor Stick class:
+    > reimplement stick is_intersecting, is_parallel methods (if needed)
+    > reimplement plotting of sticks (do we need to plot every stick separately? can we plot them all at once, specifying colors for each)
+
+# Refactor construct_knot function:
+    > make this the main function to be used to construct knots.
+    > accept all possible types of arguments to construct a knot:
+        > names of pre-saved knots
+        > name of a yaml file along with the name of the knot to be constructed
+        > directions
+        > vertices
+
+# Refactor main.py
+    > implement an argparser

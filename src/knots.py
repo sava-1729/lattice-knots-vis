@@ -6,13 +6,11 @@ class StickKnot:
     def __init__(self, vertices, analyse_distortion=True, distortion_mode="taxicab"):
         assert isinstance(vertices, (list, tuple))
         self.vertices = np.array(deepcopy(vertices))
-        print(type(self.vertices))
-        print(self.vertices.shape)
         self.critical_vertices = []
         for i in range(len(vertices)):
             assert any(vertices[i] != vertices[i-1])
-            v_prev = [p - q for (p, q) in zip(vertices[i-1], vertices[i])]
-            v_next = [p - q for (p, q) in zip(vertices[i], vertices[(i+1) % len(vertices)])]
+            v_prev = vertices[i-1] - vertices[i]
+            v_next = vertices[i] - vertices[(i+1) % len(vertices)]
             if are_vectors_parallel(v_prev, v_next):
                 continue
             if len(self.critical_vertices) == 0:
@@ -59,11 +57,11 @@ class StickKnot:
             t2 = perf_counter()
             if PROGRESS_UPDATES:
                 print("############ Numpy Distortion Analysis Complete, time taken = %f ############" % (t2-t1), flush=True)
-            t1 = perf_counter()
-            self.__analyse_distortion__(distortion_mode)
-            t2 = perf_counter()
-            if PROGRESS_UPDATES:
-                print("############ Distortion Analysis Complete, time taken = %f ############" % (t2-t1), flush=True)
+            # t1 = perf_counter()
+            # self.__analyse_distortion__(distortion_mode)
+            # t2 = perf_counter()
+            # if PROGRESS_UPDATES:
+            #     print("############ Distortion Analysis Complete, time taken = %f ############" % (t2-t1), flush=True)
             # if distortion_mode == "taxicab":
             #     self.vertex_distortion = self.vertex_distortion_taxicab
             #     self.vertex_distortion_pairs = self.vertex_distortion_pairs_taxicab
@@ -81,7 +79,7 @@ class StickKnot:
 
     def is_point_on_knot(self, point):
         for i, s in enumerate(self.edges):
-            if s.is_point_on_stick(point):
+            if s.contains(point):
                 return i
         return -1
 
@@ -102,7 +100,6 @@ class StickKnot:
         return shortest_distance
 
     def __analyse_distortion_fast__(self, mode):
-        # INCOMPLETE
         N = int(self.edge_length)
         O = np.ones((N, N))
         Tr = np.full((N, N), True)
@@ -124,6 +121,9 @@ class StickKnot:
         distortion_ratios = {"euclidean": np.ones_like(X), "taxicab": np.ones_like(X)}
         distortion_ratios["taxicab"][UT_b] = D_knot[UT_b] / D_taxicab[UT_b]
         distortion_ratios["euclidean"][UT_b] = D_knot[UT_b] / D_euclidean[UT_b]
+        distortion_ratios["taxicab"][UT_b.T] = (distortion_ratios["taxicab"].T)[UT_b.T]
+        distortion_ratios["euclidean"][UT_b.T] = (distortion_ratios["taxicab"].T)[UT_b.T]
+        self.distortion_ratios = distortion_ratios
         self.vertex_distortion = np.amax(distortion_ratios[mode][UT_b])
         XY = np.mgrid[0:N:1, 0:N:1]
         self.vertex_distortion_pairs = XY[:, distortion_ratios[mode] == self.vertex_distortion].T

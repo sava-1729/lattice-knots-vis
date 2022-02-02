@@ -1,4 +1,4 @@
-from math import sqrt
+from math import sqrt, isclose
 from random import randint
 
 import matplotlib.cm as colormap
@@ -8,7 +8,14 @@ import numpy as np
 from copy import deepcopy
 from time import perf_counter
 
+W = np.array([0,0,1])  # +z
+A = np.array([-1,0,0]) # -x
+S = np.array([0,0,-1]) # -z
+D = np.array([1,0,0])  # +x
+Q = np.array([0,1,0])  # +y
+E = np.array([0,-1,0]) # -y
 
+ABS_TOL = 1e-10
 
 PRE_COLORS = list(mcolors.BASE_COLORS.values()) + list(mcolors.XKCD_COLORS.values())
 PRE_COLORS.remove(mcolors.BASE_COLORS["w"])
@@ -33,6 +40,11 @@ def get_error_msg(name_of_erroneous_item, expected_value, actual_value):
     msg += "Given: %s \n" % str(actual_value)
     return msg
 
+def are_3d_points(*points):
+    for p in points:
+        assert isinstance(p, np.ndarray)
+        assert p.shape == (3,)
+
 def assert_is_3d_point(x):
     assert isinstance(x, (tuple, list, np.ndarray)), get_error_msg("Point datatype", "list or tuple", type(x))
     assert len(x) == 3, get_error_msg("Point dimension", 3, len(x))
@@ -40,10 +52,8 @@ def assert_is_3d_point(x):
         assert isinstance(c, (int, float)) or np.issubdtype(c, np.number), get_error_msg("Point coordinate datatype", "int or float", type(c))
 
 def are_vectors_parallel(x, y):
-    assert_is_3d_point(x)
-    assert_is_3d_point(y)
-    cross = np.cross(np.array(x), np.array(y))
-    return all(cross == 0)
+    are_3d_points(x, y)
+    return np.allclose(x / np.sqrt(np.sum(x ** 2)), y / np.sqrt(np.sum(y ** 2)), rtol=0)
 
 def create_new_figure(bgcolor=(0,0,0)):
     global FIGURE

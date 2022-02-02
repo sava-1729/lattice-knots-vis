@@ -127,8 +127,8 @@ DIRECTIONS = []
 ####################################### FIGURE 8 #############################################
 
 ############################# Minimal Stick Number Conformation ##############################
-# N = 1
-# DIRECTIONS = np.array([D, Q*2, W*2, E*3, A*2, Q*4, D*3, S, E*2, A*2, Q*3, W*2, E*4])*N
+N = 1
+DIRECTIONS = np.array([D, Q*2, W*2, E*3, A*2, Q*4, D*3, S, E*2, A*2, Q*3, W*2, E*4])*N
 ###########################################################################################################
 
 ########################## Replicating Standard Smooth Conformation ##########################
@@ -333,4 +333,4 @@ draw_knot(DIRECTIONS, show=True) #, div=5)
 
 # k3.plot(bgcolor=(0,0,0), mode="tube", thickness=0.5, label_vertices=False, highlight_vertices=1, highlight_vertex_distortion_pairs=False, new_figure=False)
 
-# mlab.show()
+mlab.show()
