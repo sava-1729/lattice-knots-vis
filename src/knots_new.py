@@ -28,7 +28,7 @@ class StickKnot:
     def __validate__(self):
         assert np.allclose(self.vertices[-1] + self.directions[-1], np.zeros(3), rtol=0)
         for i in range(self.length):
-            for j in range(i+2, self.length):
+            for j in range(i+2, self.length-1 if i == 0 else self.length):
                 assert not self.sticks[i].intersects(self.sticks[j])
 
     def contains(self, point):
