@@ -1,19 +1,49 @@
-from matplotlib.pyplot import axis
 from sticks import *
 
-class StickKnot:
-    def __init__(self, directions, compute_distortion=True, validate=True):
-        assert isinstance(directions, np.ndarray)
-        self.directions = np.append(directions, [-np.sum(directions, axis=0)], axis=0)
-        self.length = self.directions.shape[0]
-        self.__generate_sticks__()
-        if validate:
-            self.__validate__()
-        if compute_distortion:
-            self.__compute_distortion__()
+class Direction:
+    def __init__(self, x=0, y=0, z=0):
+        self.__vector = np.array((x, y, z))
+        if np.issubdtype(self.__vector.dtype, np.signedinteger):
+            self.type_ = int
+        elif np.issubdtype(self.__vector.dtype, np.floating):
+            self.type_ = float
+        else:
+            raise TypeError("Coordinates of directions must be real numbers.")
+        assert (x != 0) or (y != 0) or (z != 0)
+    def get_vector(self):
+        return self.__vector
 
-    def __generate_sticks__(self):
-        N = self.length
+def X(t=1):
+    return Direction(x=t)
+def Y(t=1):
+    return Direction(y=t)
+def Z(t=1):
+    return Direction(z=t)
+def XYZ(p, q, r):
+    return Direction(x=p, y=q, z=r)
+
+class StickKnot(object):
+    def __init__(self, directions, compute_distortion=True, validate=True, mode='taxicab'):
+        assert isinstance(directions, (np.ndarray, list, tuple))
+        self._store_directions(directions)
+        self._generate_sticks()
+        if validate:
+            self._validate()
+        if compute_distortion:
+            self.mode = mode
+            self._compute_distortion_fast()
+
+
+    def _store_directions(self, directions):
+        self.num_vertices = len(directions)
+        self.directions = np.zeros((self.num_vertices, 3))
+        for i, d in enumerate(directions):
+            assert isinstance(d, Direction)
+            self.directions[i] = d.get_vector()
+
+
+    def _generate_sticks(self):
+        N = self.num_vertices
         self.vertices = np.zeros((N, 3))
         self.vertices_loop = np.zeros((N+2, 3))
         self.sticks = [None for i in range(N)]
@@ -25,43 +55,115 @@ class StickKnot:
         self.vertices_loop[0] = midpoint
         self.vertices_loop[-1] = midpoint
 
-    def __validate__(self):
+
+    def _validate(self):
         assert np.allclose(self.vertices[-1] + self.directions[-1], np.zeros(3), rtol=0)
-        for i in range(self.length):
-            for j in range(i+2, self.length-1 if i == 0 else self.length):
+        for i in range(self.num_vertices):
+            for j in range(i+2, self.num_vertices-1 if i == 0 else self.num_vertices):
                 assert not self.sticks[i].intersects(self.sticks[j])
+
 
     def contains(self, point):
         return any([s.contains(point) for s in self.sticks])
 
-    def __compute_distance_matrix__(self):
-        pass
+
+    def _compute_distance_matrix(self):
+        N = self.num_vertices
+        O = np.ones((N, N))
+        diag_b = np.identity(N, dtype=bool)
+        self.distance_matrix = np.zeros((N, N))
+        self.distance_matrix[diag_b] = [s.length for s in self.sticks]
+        self.total_length = np.trace(self.distance_matrix)
+        self.distance_matrix = np.triu(O) @ (self.distance_matrix @ np.triu(O, k=1))
+        self.distance_matrix = np.minimum(self.total_length - self.distance_matrix, self.distance_matrix)
+        Lt_b = np.tril(np.full_like(O, True), k=1)
+        self.distance_matrix[Lt_b.T] = (self.distance_matrix.T)[Lt_b.T]
+
 
     def distance_between(self, x, y):
         pass
-    def __compute_distortion__(self):
+
+
+    def _compute_distortion(self):
         # by iterating over vertices
         pass
-    def __compute_distortion_fast__(self):
-        # using numpy
-        pass
+
+
+    def _compute_distortion_fast(self):
+        N = int(self.num_vertices)
+        O = np.ones((N, N))
+        Tr = np.full((N, N), True)
+        UT_b = np.triu(Tr, k=1)
+        X = O * self.vertices[:, 0]
+        Y = O * self.vertices[:, 1]
+        Z = O * self.vertices[:, 2]
+        self._compute_distance_matrix()
+        D_knot = self.distance_matrix
+        D_taxicab = np.zeros_like(X)
+        D_taxicab[UT_b] = np.abs(X[UT_b] - X.T[UT_b]) + \
+                               np.abs(Y[UT_b] - Y.T[UT_b]) + \
+                               np.abs(Z[UT_b] - Z.T[UT_b])
+        D_euclidean = np.zeros_like(X)
+        D_euclidean[UT_b] = np.sqrt(np.abs(X[UT_b] - X.T[UT_b])**2 + \
+                                    np.abs(Y[UT_b] - Y.T[UT_b])**2 + \
+                                    np.abs(Z[UT_b] - Z.T[UT_b])**2)
+        distortion_ratios = {"euclidean": np.ones_like(X), "taxicab": np.ones_like(X)}
+        distortion_ratios["taxicab"][UT_b] = D_knot[UT_b] / D_taxicab[UT_b]
+        distortion_ratios["euclidean"][UT_b] = D_knot[UT_b] / D_euclidean[UT_b]
+        distortion_ratios["taxicab"][UT_b.T] = (distortion_ratios["taxicab"].T)[UT_b.T]
+        distortion_ratios["euclidean"][UT_b.T] = (distortion_ratios["taxicab"].T)[UT_b.T]
+        self.distortion_ratios = distortion_ratios
+        self.vertex_distortion = np.amax(distortion_ratios[self.mode][UT_b])
+        XY = np.mgrid[0:N:1, 0:N:1]
+        self.vertex_distortion_pairs = XY[:, distortion_ratios[self.mode] == self.vertex_distortion].T
+
 
     def plot(self):
         X, Y, Z = self.vertices_loop.T
-        mlab.plot3d(X, Y, Z, np.arange(self.length+2), colormap='hsv', tube_radius=0.05, tube_sides=12)
+        mlab.plot3d(X, Y, Z, np.arange(self.num_vertices+2), colormap='hsv', tube_radius=0.05, tube_sides=12)
 
 
 class LatticeKnot(StickKnot):
-    def __init__(self, directions, compute_distortion=True, divisions=1):
-        assert isinstance(divisions, int)
-        self.divisions = divisions
-        self.unit_edge_length = 1. / divisions
-        StickKnot.__init__(self, directions, compute_distortion=compute_distortion)
-        pass
-    def __compute_vertices__(self):
-        pass
-    def __validate__(self):
-        pass
-    def __compute_distance_matrix__(self):
-        # only this needs to be changed to make distortion calculation efficient for lattice knots.
-        pass
+    def __init__(self, directions, **kwargs):
+        assert isinstance(directions, (np.ndarray, list, tuple))
+        super().__init__(directions, **kwargs)
+
+
+    def _store_directions(self, directions):
+        lengths = [0 for d in directions]
+        self.num_vertices = 0
+        for i, d in enumerate(directions):
+            assert isinstance(d, Direction)
+            assert d.type_ is int
+            v = d.get_vector()
+            flag = False
+            # write the code in the for loop more efficiently, check axial directions in a single line
+            for v_j in v:
+                if v_j != 0:
+                    if flag is True:
+                        raise ValueError("Expected axial directions only.")
+                    flag = True
+                    self.num_vertices += abs(v_j)
+                    lengths[i] = abs(v_j)
+        self.directions = np.zeros((self.num_vertices, 3))
+        index = 0
+        for i, d in enumerate(directions):
+            for j in range(lengths[i]):
+                self.directions[index] = d.get_vector() // lengths[i]
+                index += 1
+
+
+    # def _validate(self):
+    #     pass
+
+
+    def _compute_distance_matrix(self):
+        N = int(self.num_vertices)
+        O = np.ones((N, N))
+        Tr = np.full((N, N), True)
+        UT_b = np.triu(Tr)
+        D_knot = O * np.arange(N)
+        D_knot[UT_b] = np.abs(D_knot[UT_b] - D_knot.T[UT_b])
+        D_knot[UT_b] = np.minimum(D_knot[UT_b], N - D_knot[UT_b])
+        D_knot[UT_b.T] = (D_knot.T)[UT_b.T]
+        self.distance_matrix = D_knot

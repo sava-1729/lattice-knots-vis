@@ -11,7 +11,7 @@ class Stick:
         self.Y = np.linspace(self.start[1], self.end[1], 3)
         self.Z = np.linspace(self.start[2], self.end[2], 3)
         self.vector = self.end - self.start
-        self.length = np.sqrt(sum((self.end - self.start) ** 2))
+        self.length = np.sqrt(np.sum((self.end - self.start) ** 2))
         self.unit_vector = self.vector / self.length
 
     def identify(self):
