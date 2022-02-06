@@ -121,3 +121,25 @@ def smooth_distortion(knot, num_divisions=10, mode=2):
             vertex_j = stick.start + ((j % num_divisions) / num_divisions) * stick.vector
             distortion_pairs.append((vertex_i, vertex_j))
     return (distortion, distortion_pairs)
+
+class Direction:
+    def __init__(self, x=0, y=0, z=0):
+        self.__vector = np.array((x, y, z))
+        if np.issubdtype(self.__vector.dtype, np.signedinteger):
+            self.type_ = int
+        elif np.issubdtype(self.__vector.dtype, np.floating):
+            self.type_ = float
+        else:
+            raise TypeError("Coordinates of directions must be real numbers.")
+        assert (x != 0) or (y != 0) or (z != 0)
+    def get_vector(self):
+        return self.__vector
+
+def X(t=1):
+    return Direction(x=t)
+def Y(t=1):
+    return Direction(y=t)
+def Z(t=1):
+    return Direction(z=t)
+def XYZ(p, q, r):
+    return Direction(x=p, y=q, z=r)

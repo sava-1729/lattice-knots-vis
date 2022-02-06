@@ -72,28 +72,22 @@ class Stick:
             t, s = np.linalg.solve([[v1, -w1], [v2, -w2]], [b1-a1, b2-a2])
             lines_intersect = isclose(t*v3 - s*w3, b3 - a3, rel_tol=0, abs_tol=ABS_TOL)
             if lines_intersect:
-                print("Case 1")
                 return (0 <= t) and (t <= 1) and (0 <= s) and (s <= 1)
             else:
-                print("Case 2")
                 return False
         elif not isclose(np.linalg.det([[v1, -w1], [v3, -w3]]), 0, rel_tol=0, abs_tol=ABS_TOL):
             t, s = np.linalg.solve([[v1, -w1], [v3, -w3]], [b1-a1, b3-a3])
             lines_intersect = isclose(t*v2 - s*w2, b2 - a2, rel_tol=0, abs_tol=ABS_TOL)
             if lines_intersect:
-                print("Case 1")
                 return (0 <= t) and (t <= 1) and (0 <= s) and (s <= 1)
             else:
-                print("Case 2")
                 return False
         elif not isclose(np.linalg.det([[v2, -w2], [v3, -w3]]), 0, rel_tol=0, abs_tol=ABS_TOL):
             t, s = np.linalg.solve([[v2, -w2], [v3, -w3]], [b2-a2, b3-a3])
             lines_intersect = isclose(t*v1 - s*w1, b1 - a1, rel_tol=0, abs_tol=ABS_TOL)
             if lines_intersect:
-                print("Case 1")
                 return (0 <= t) and (t <= 1) and (0 <= s) and (s <= 1)
             else:
-                print("Case 2")
                 return False
         else:
             other_ends_on_self = self.contains(other_stick.start) or \
@@ -102,8 +96,7 @@ class Stick:
                                     other_stick.contains(self.end)
             if (other_ends_on_self or self_ends_on_others):
                 print("Self: %s -> %s" % (self.start, self.end))
-                print("Other: %s -> %s" % (other_stick.start, other_stick.end))  
-            print("Case 5")
+                print("Other: %s -> %s" % (other_stick.start, other_stick.end))
             return other_ends_on_self or self_ends_on_others
 
 

@@ -1,27 +1,5 @@
 from sticks import *
 
-class Direction:
-    def __init__(self, x=0, y=0, z=0):
-        self.__vector = np.array((x, y, z))
-        if np.issubdtype(self.__vector.dtype, np.signedinteger):
-            self.type_ = int
-        elif np.issubdtype(self.__vector.dtype, np.floating):
-            self.type_ = float
-        else:
-            raise TypeError("Coordinates of directions must be real numbers.")
-        assert (x != 0) or (y != 0) or (z != 0)
-    def get_vector(self):
-        return self.__vector
-
-def X(t=1):
-    return Direction(x=t)
-def Y(t=1):
-    return Direction(y=t)
-def Z(t=1):
-    return Direction(z=t)
-def XYZ(p, q, r):
-    return Direction(x=p, y=q, z=r)
-
 class StickKnot(object):
     def __init__(self, directions, compute_distortion=True, validate=True, mode='taxicab'):
         assert isinstance(directions, (np.ndarray, list, tuple))
@@ -76,8 +54,8 @@ class StickKnot(object):
         self.total_length = np.trace(self.distance_matrix)
         self.distance_matrix = np.triu(O) @ (self.distance_matrix @ np.triu(O, k=1))
         self.distance_matrix = np.minimum(self.total_length - self.distance_matrix, self.distance_matrix)
-        Lt_b = np.tril(np.full_like(O, True), k=1)
-        self.distance_matrix[Lt_b.T] = (self.distance_matrix.T)[Lt_b.T]
+        Lt_b = np.tril(np.full((N, N), True), k=1)
+        self.distance_matrix[Lt_b] = (self.distance_matrix.T)[Lt_b]
 
 
     def distance_between(self, x, y):
