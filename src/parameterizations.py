@@ -66,7 +66,7 @@ def get_figure8_extra_crossing(L, num_points=200):
     return get_Direction_array(X, Y, Z, num_points)
 
 def get_smooth_shastri_trefoil(L, num_points):
-    T = np.linspace(0, 5, endpoint=False, num=num_points)
+    T = np.linspace(-2.2, 2.2, endpoint=False, num=num_points)
 
     X = L * ((T**3) - (3*T))
     Y = L * ((T**4) - (4*(T**2)))
@@ -118,6 +118,15 @@ def get_smooth_torus_trefoil(L, num_points=100):
     X = L * (2 + np.cos(3*T)) * np.cos(2*T)
     Y = L * (2 + np.cos(3*T)) * np.sin(2*T)
     Z = L * np.sin(3*T)
+
+    return get_Direction_array(X, Y, Z, num_points)
+
+def get_smooth_torus_knot(p, q, L, num_points=100):
+    T = np.linspace(0, 2*pi, endpoint=False, num=num_points)
+
+    X = L * (3 + np.cos(p*T)) * np.cos(q*T)
+    Y = L * (3 + np.cos(p*T)) * np.sin(q*T)
+    Z = L * np.sin(p*T)
 
     return get_Direction_array(X, Y, Z, num_points)
 

@@ -1,7 +1,7 @@
 from sticks import *
 
 class StickKnot(object):
-    def __init__(self, directions, compute_distortion=True, validate=True, mode='taxicab'):
+    def __init__(self, directions, compute_distortion=True, validate=True, mode="euclidean"):
         assert isinstance(directions, (np.ndarray, list, tuple))
         self._store_directions(directions)
         self._generate_sticks()
@@ -28,7 +28,7 @@ class StickKnot(object):
         for i in range(N):
             self.vertices_loop[i+1] = self.vertices_loop[i] + self.directions[i]
             self.sticks[i] = Stick(self.vertices_loop[i], self.vertices_loop[i+1], i)
-        self.vertices = self.vertices_loop[:N]
+        self.vertices[:] = self.vertices_loop[:N]
         midpoint = (self.vertices_loop[0] + self.vertices_loop[1]) * 0.5
         self.vertices_loop[0] = midpoint
         self.vertices_loop[-1] = midpoint
@@ -54,7 +54,7 @@ class StickKnot(object):
         self.total_length = np.trace(self.distance_matrix)
         self.distance_matrix = np.triu(O) @ (self.distance_matrix @ np.triu(O, k=1))
         self.distance_matrix = np.minimum(self.total_length - self.distance_matrix, self.distance_matrix)
-        Lt_b = np.tril(np.full((N, N), True), k=1)
+        Lt_b = np.tril(np.full((N, N), True), k=-1)
         self.distance_matrix[Lt_b] = (self.distance_matrix.T)[Lt_b]
 
 
@@ -77,34 +77,39 @@ class StickKnot(object):
         Z = O * self.vertices[:, 2]
         self._compute_distance_matrix()
         D_knot = self.distance_matrix
-        D_taxicab = np.zeros_like(X)
-        D_taxicab[UT_b] = np.abs(X[UT_b] - X.T[UT_b]) + \
-                               np.abs(Y[UT_b] - Y.T[UT_b]) + \
-                               np.abs(Z[UT_b] - Z.T[UT_b])
+
         D_euclidean = np.zeros_like(X)
         D_euclidean[UT_b] = np.sqrt(np.abs(X[UT_b] - X.T[UT_b])**2 + \
                                     np.abs(Y[UT_b] - Y.T[UT_b])**2 + \
                                     np.abs(Z[UT_b] - Z.T[UT_b])**2)
-        distortion_ratios = {"euclidean": np.ones_like(X), "taxicab": np.ones_like(X)}
-        distortion_ratios["taxicab"][UT_b] = D_knot[UT_b] / D_taxicab[UT_b]
+        distortion_ratios = {"euclidean": np.ones_like(X)}
         distortion_ratios["euclidean"][UT_b] = D_knot[UT_b] / D_euclidean[UT_b]
-        distortion_ratios["taxicab"][UT_b.T] = (distortion_ratios["taxicab"].T)[UT_b.T]
-        distortion_ratios["euclidean"][UT_b.T] = (distortion_ratios["taxicab"].T)[UT_b.T]
+        distortion_ratios["euclidean"][UT_b.T] = (distortion_ratios["euclidean"].T)[UT_b.T]
+
+        if self.mode == "taxicab":
+            D_taxicab = np.zeros_like(X)
+            D_taxicab[UT_b] = np.abs(X[UT_b] - X.T[UT_b]) + \
+                                np.abs(Y[UT_b] - Y.T[UT_b]) + \
+                                np.abs(Z[UT_b] - Z.T[UT_b])
+            distortion_ratios["taxicab"] = np.ones_like(X)
+            distortion_ratios["taxicab"][UT_b] = D_knot[UT_b] / D_taxicab[UT_b]
+            distortion_ratios["taxicab"][UT_b.T] = (distortion_ratios["taxicab"].T)[UT_b.T]
+
         self.distortion_ratios = distortion_ratios
         self.vertex_distortion = np.amax(distortion_ratios[self.mode][UT_b])
-        XY = np.mgrid[0:N:1, 0:N:1]
+        XY = np.mgrid[0:N, 0:N]
         self.vertex_distortion_pairs = XY[:, distortion_ratios[self.mode] == self.vertex_distortion].T
 
 
     def plot(self):
         X, Y, Z = self.vertices_loop.T
-        mlab.plot3d(X, Y, Z, np.arange(self.num_vertices+2), colormap='hsv', tube_radius=0.05, tube_sides=12)
+        mlab.plot3d(X, Y, Z, np.arange(self.num_vertices+2), colormap="hsv", tube_radius=0.05, tube_sides=12)
 
 
 class LatticeKnot(StickKnot):
-    def __init__(self, directions, **kwargs):
+    def __init__(self, directions, mode="taxicab", **kwargs):
         assert isinstance(directions, (np.ndarray, list, tuple))
-        super().__init__(directions, **kwargs)
+        super().__init__(directions, mode=mode, **kwargs)
 
 
     def _store_directions(self, directions):
