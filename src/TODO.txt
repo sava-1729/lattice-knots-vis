@@ -1,31 +1,42 @@
 # Refactor StickKnot class:
-    > reimplement knot validation using numpy, make separate function for this
-    > reimplement identification of critical vertices
-    > implement distortion for non-lattice stick knots using numpy 
-    > implement an exclusive lattice mode in StickKnot class (so that distortion calculation & knot validation is faster for lattice knots)
+    x reimplement knot validation using numpy, make separate function for this - DONE
+    x reimplement identification of critical vertices - DONE
+    x implement distortion for non-lattice stick knots using numpy - DONE
+    x implement an exclusive lattice mode in StickKnot class (so that distortion calculation & knot validation is faster for lattice knots) - DONE
     > reimplement plot() function using numpy, preserve all features:
-        > supply vertices to plot3d() in order to plot knot sticks - DONE
-        > use mlab's colormap with scalar_mode='none' to color the knot sticks (all matplotlib colormap names work!!!) - DONE
+        x supply vertices to plot3d() in order to plot knot sticks - DONE
+        x use mlab's colormap with scalar_mode='none' to color the knot sticks (all matplotlib colormap names work!!!) - DONE
         > use color range to color only specific vertices with distortion in a certain range
-        > $ construct a visualization of the distortion function using a colored torus $ - DONE
-    > merge construct_knot with StickKnot, allow vertices / directions both in the constructor, identify using a flag (as an optional argument)
-    > reimplement coloring of knots - DONE
+        x $ construct a visualization of the distortion function using a colored torus $ - DONE
+    x reimplement coloring of knots - DONE
+
+X Refactor Stick class:
+    x reimplement stick is_intersecting, is_parallel methods (if needed) - DONE
+    x reimplement plotting of sticks (do we need to plot every stick separately? can we plot them all at once, specifying colors for each) - DONE
+
+# Write a new main file
+    > implement an argparser
     > implement read/write from/to a yaml file to maintain knot parameterizations
         > allow users to load their own yaml files
         > list all the available knots and ask which one(s) to plot - accept a comma separated list of indices
         > allow plotting multiple knots in the same figure
+    > Rewrite construct_knot function:
+        > make this the main function to be used to construct knots
+        > accept all possible types of arguments to construct a knot:
+            > names of pre-saved knots
+            > name of a yaml file along with the name of the knot to be constructed
+            > list of direction objects
+            > list of vertices
 
-# Refactor Stick class:
-    > reimplement stick is_intersecting, is_parallel methods (if needed)
-    > reimplement plotting of sticks (do we need to plot every stick separately? can we plot them all at once, specifying colors for each)
-
-# Refactor construct_knot function:
-    > make this the main function to be used to construct knots.
-    > accept all possible types of arguments to construct a knot:
-        > names of pre-saved knots
-        > name of a yaml file along with the name of the knot to be constructed
-        > directions
-        > vertices
-
-# Refactor main.py
-    > implement an argparser
+# Make StickKnot and LatticeKnot classes derived from HasTraits
+    > Create a UI for knot construction and distortion analysis, using TraitsUI, with the following features:
+        > Allow loading knots from files
+        > Allow loading popular knots (eg. torus knots, etc) by name (in a dropdown?)
+        > Embed the knot figure as well as the distortion torus figure in the same window
+            > Allow selection of a pair of points on the knot and show their distortion ratio
+            > Use a bounded ScalarCutPlanes to select points on the knot?
+                > Alternatively, can also use a slider to select points on the knot
+        > Allow constructing a knot purely using arrow keys (or WASDQE)
+            > Embed a chaco plot that allows user to convert a 2D lattice knot diagram to a 3D one?
+        > Show various options for displaying the knot, e.g. highlight_vertices, or distortion_mode, etc.
+        > Allow scaling the knot
