@@ -134,6 +134,12 @@ class Direction:
         assert (x != 0) or (y != 0) or (z != 0)
     def get_vector(self):
         return self.__vector
+    def __sub__(self, other_dir):
+        assert isinstance(other_dir, Direction)
+        return Direction(*(self.get_vector() - other_dir.get_vector()))
+    def __add__(self, other_dir):
+        assert isinstance(other_dir, Direction)
+        return Direction(*(self.get_vector() + other_dir.get_vector()))
 
 def X(t=1):
     return Direction(x=t)
@@ -143,3 +149,19 @@ def Z(t=1):
     return Direction(z=t)
 def XYZ(p, q, r):
     return Direction(x=p, y=q, z=r)
+
+def plot_3d_lattice(fig=None, xlim=(-10, 10), ylim=(-10, 10), zlim=(-10, 10), res=5):
+    if fig is None:
+        fig = mlab.gcf()
+    X = np.linspace(xlim[0], xlim[1], num=res, endpoint=False)
+    Y = np.linspace(ylim[0], ylim[1], num=res, endpoint=False)
+    Z = np.linspace(zlim[0], zlim[1], num=res, endpoint=False)
+
+    for x in X:
+        for y in Y:
+            for z in Z:
+                mlab.plot3d((x, x), (y, y), zlim, tube_radius=0.15, color=(1,1,1))
+                mlab.plot3d((x, x), ylim, (z, z), tube_radius=0.15, color=(1,1,1))
+                mlab.plot3d(xlim, (y, y), (z, z), tube_radius=0.15, color=(1,1,1))
+    # X, Y, Z = np.mgrid[xlim[0]:xlim[1]:res, ylim[0]:ylim[1]:res, zlim[0]:zlim[1]:res]
+    # mlab.mesh(X, Y, Z, figure=fig)

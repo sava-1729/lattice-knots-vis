@@ -145,18 +145,19 @@ def get_K_p(P, num_points=100):
     sign = 1
     for i in range(1, 2*P - 1):
         y_len = (P - 1) if i % 2 == 1 else P
-        DIRECTIONS.append(sign * W * (2*P - i))
-        DIRECTIONS.append(sign * D * x_len)
-        DIRECTIONS.append(sign * Q * y_len)
+        DIRECTIONS.append(Z(sign * (2*P - i)))
+        DIRECTIONS.append(X(sign * x_len))
+        DIRECTIONS.append(Y(sign * y_len))
         if i % 2 == 1:
             x_len += 1
         sign = -sign
-    DIRECTIONS.append(sign * W * 1)
-    DIRECTIONS.append(sign * D * P)
-    DIRECTIONS.append(sign * Q * (2*P - 1))
+    DIRECTIONS.append(Z(sign * 1))
+    DIRECTIONS.append(X(sign * P))
+    DIRECTIONS.append(Y(sign * (2*P - 1)))
     sign = -sign
-    DIRECTIONS.append(sign * W * P)
-    DIRECTIONS.append(sign * D * 1)
+    DIRECTIONS.append(Z(sign * P))
+    DIRECTIONS.append(X(sign * 1))
+    DIRECTIONS.append(Y(sign * P))
     # DIRECTIONS.append(DIRECTIONS[0]-DIRECTIONS[-1])
     return np.array(DIRECTIONS)
 
