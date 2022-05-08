@@ -12,9 +12,11 @@ def get_torus(R, r, phi, theta):
     w = sin(theta)
     return (x, y, z, u, v, w)
 
-def visualize_distortion(knot, plot_knot=False, cmap="cool", highlight_peaks=True):
+def visualize_distortion(knot, plot_knot=False, cmap="cool", highlight_peaks=True, scene_mlab=None):
+    if scene_mlab is None:
+        scene_mlab = mlab
     if plot_knot:
-        mlab.figure(bgcolor=(0,0,0))
+        scene_mlab.figure(bgcolor=(0,0,0))
         knot.plot()
     N = knot.num_vertices
 
@@ -31,11 +33,12 @@ def visualize_distortion(knot, plot_knot=False, cmap="cool", highlight_peaks=Tru
     d = knot.distortion_ratios["euclidean"]
     f = (d / np.amax(d)) * max_f_radius # normalized
 
-    mlab.figure(bgcolor=(0,0,0))
+    # scene_mlab.figure(bgcolor=(0,0,0))
     # mlab.mesh(x, y, z, color=(0.5,0.5,0.5))#, colormap='viridis') # plotting torus
     # mlab.quiver3d(x, y, z, u, v, w, scale_mode='none') # plotting normal vectors on torus
-    plot = mlab.mesh(x + f*u, y + f*v, z + f*w, colormap=cmap, scalars=d, scale_mode="none") # plotting f on torus!
-    mlab.colorbar()
+    plot = scene_mlab.mesh(x + f*u, y + f*v, z + f*w, colormap=cmap, scalars=d, scale_mode="none") # plotting f on torus!
+    scene_mlab.colorbar()
+    peaks = None
     if highlight_peaks:
         inner_ratios = d[1:-1, 1:-1]
         peaks_flag = np.full_like(d, fill_value=False, dtype=bool)
@@ -46,12 +49,14 @@ def visualize_distortion(knot, plot_knot=False, cmap="cool", highlight_peaks=Tru
         px = px + f[peaks_flag]*pu
         py = py + f[peaks_flag]*pv
         pz = pz + f[peaks_flag]*pw
-        mlab.quiver3d(px, py, pz, pu, pv, pw, color=(1,1,1), mode="arrow", scale_factor=1)
-    return plot
+        peaks = scene_mlab.quiver3d(px, py, pz, pu, pv, pw, color=(1,1,1), mode="arrow", scale_factor=1)
+    return (plot, peaks)
 
 if __name__ == "__main__":
-    DIRECTIONS = get_smooth_figure8(5, num_points=500)
+    DIRECTIONS = get_minimal_lattice_trefoil(1, num_points=100) #get_smooth_figure8(5, num_points=500)
     K = StickKnot(DIRECTIONS, validate=False, compute_distortion=True, mode="euclidean")
+    print(K.vertex_distortion_pairs)
+    K.plot()
 
-    plot = visualize_distortion(K, plot_knot=True, cmap="plasma")
+    # plot = visualize_distortion(K, plot_knot=True, cmap="plasma")
     mlab.show()

@@ -29,8 +29,8 @@ def get_Direction_array(X, Y, Z, num_points):
     return directions
 
 def get_minimal_lattice_trefoil(L, num_points=100):
-    DIRECTIONS = np.array([D*3, Q*2, W, A*2, E*3, S*2, D, Q*2, W*3, A*2, E, S*2])*L
-    return get_knot_vertices(DIRECTIONS, num_points)
+    DIRECTIONS = np.array([X(3), Y(2), Z(), X(-2), Y(-3), Z(-2), X(), Y(2), Z(3), X(-2), Y(-1), Z(-2)])
+    return DIRECTIONS #get_knot_vertices(DIRECTIONS, num_points)
 
 def get_lattice_trefoil_vd_10_33(L, num_points=100):
     DIRECTIONS = np.array([X(8), Y(5), Z(4), X(-5), Y(-5), X(), Y(-4), Z(-8), Y(8), Z(5), Y(-1), X(), Z(), X(), Y(-1), Z(), X(), Y(-1), Z(5), X(-7), Y(-1), Z(-8)])

@@ -96,14 +96,32 @@ class StickKnot(object):
             distortion_ratios["taxicab"][UT_b.T] = (distortion_ratios["taxicab"].T)[UT_b.T]
 
         self.distortion_ratios = distortion_ratios
-        self.vertex_distortion = np.amax(distortion_ratios[self.mode][UT_b])
+        self.highest_distortion_ratio_of_vertex = np.amax(self.distortion_ratios[self.mode], 0)
+        self.vertex_distortion = np.amax(distortion_ratios[self.mode][UT_b]) # self.highest_distortion_ratio_of_vertex)
         XY = np.mgrid[0:N, 0:N]
-        self.vertex_distortion_pairs = XY[:, distortion_ratios[self.mode] == self.vertex_distortion].T
+        self.vertex_distortion_pairs = XY[:, np.isclose(distortion_ratios[self.mode], self.vertex_distortion, rtol=0)].T
+        print(self.vertex_distortion_pairs.shape)
+        self.highest_distortion_ratio_of_vertex_loop = np.empty((N+2,))
+        self.highest_distortion_ratio_of_vertex_loop[:N] = self.highest_distortion_ratio_of_vertex
+        b, a = self.highest_distortion_ratio_of_vertex[0], self.highest_distortion_ratio_of_vertex[-1]
+        self.highest_distortion_ratio_of_vertex_loop[N] = (a + (2. * b))/3
+        self.highest_distortion_ratio_of_vertex_loop[N+1] = (b + (2. * a))/3
 
 
-    def plot(self):
+    def plot(self, scalars=None, colormap=None, colorbar=True, scene_mlab=None):
+        if scene_mlab is None:
+            scene_mlab = mlab
+        if scalars is None:
+            self.default_plot_scalars = np.arange(self.num_vertices+2)
+            scalars = self.default_plot_scalars
+        if colormap is None:
+            colormap = "hsv"
         X, Y, Z = self.vertices_loop.T
-        mlab.plot3d(X, Y, Z, np.arange(self.num_vertices+2), colormap="hsv", tube_radius=0.05, tube_sides=12)
+        args = [X, Y, Z, scalars]
+        kwargs = {"colormap": colormap, "tube_radius": 0.05, "tube_sides": 12}
+        self.plot_obj = scene_mlab.plot3d(*args, **kwargs)
+        # scene_mlab.colorbar(object=self.plot_obj, title="Colorbar", orientation="horizontal")
+        return self.plot_obj
 
 
 class LatticeKnot(StickKnot):
