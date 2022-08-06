@@ -1,3 +1,24 @@
+"""
+This file contains functions to visualize distortion of a knot in a
+completely new way, by laying out the distortion function on a torus.
+Copyright (C) 2022-23 Vatsal Srivastava
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You can find a copy of the GNU General Public License in the root
+directory of this repository, named `LICENSE.md`.
+If you do not find it, see <https://www.gnu.org/licenses/>.
+"""
+
+
 from knots_new import *
 from numpy import cos, sin, pi, mgrid, abs, minimum
 from parameterizations import *
